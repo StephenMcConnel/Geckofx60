@@ -481,6 +481,10 @@ namespace Gecko
 			if (WebBrowserFocus != null)			
 				WebBrowserFocus.Activate();
 			
+#if GTK
+			m_wrapper.SetInputFocus();		
+#endif
+			
 			base.OnEnter(e);
 		}
 
@@ -488,6 +492,10 @@ namespace Gecko
 		{
 		      if (WebBrowserFocus != null && !IsBusy)
 		            WebBrowserFocus.Deactivate();
+			
+#if GTK
+			m_wrapper.RemoveInputFocus();		
+#endif
 		           
 		      base.OnLeave(e);
 		}
