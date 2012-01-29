@@ -65,6 +65,27 @@ namespace Gecko
 				setter(str);
 			}
 		}
+
+		/// <summary>
+		/// Passes <paramref name="value"/> to function and return value
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="func"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static T Pass<T>(Func<nsAUTF8String, T> func, string value)
+		{
+			T ret;
+			using (nsAUTF8String str = new nsAUTF8String(value))
+			{
+				//this is already checked in nsAUTF8String constructor
+				//if (!string.IsNullOrEmpty(value))
+				//	str.SetData(value);
+
+				ret = func(str);
+			}
+			return ret;
+		}
 		
 		public delegate void StringAttributeAnsi(nsACString str);
 		
@@ -76,6 +97,18 @@ namespace Gecko
 				return str.ToString();
 			}
 		}
+
+		public static string Get(Action<nsACString,nsACString> getter,string inValue)
+		{
+			using (nsACString nativeIn = new nsACString(inValue), nativeOut = new nsACString())
+			{
+				//if (!string.IsNullOrEmpty(inValue))
+				//    nativeIn.SetData( inValue );
+
+				getter( nativeIn, nativeOut );
+				return nativeOut.ToString();
+			}
+		}
 		
 		public static void Set(StringAttributeAnsi setter, string value)
 		{
@@ -85,6 +118,20 @@ namespace Gecko
 					str.SetData(value);
 				
 				setter(str);
+			}
+		}
+
+		public static void Pass(Action<nsACString, nsACString> func, string value1, string value2)
+		{
+			using (nsACString native1 = new nsACString(value1), native2 = new nsACString(value2))
+			{
+				//if (!string.IsNullOrEmpty(value1))
+				//	native1.SetData(value1);
+
+				//if (!string.IsNullOrEmpty(value2))
+				//	native2.SetData(value2);
+
+				func(native1, native2);
 			}
 		}
 		
@@ -109,6 +156,28 @@ namespace Gecko
 				setter(str);
 			}
 		}
+
+		/// <summary>
+		/// Passes <paramref name="value"/> to function and return value
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="func"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static T Pass<T>(Func<nsAString,T> func,string value)
+		{
+			T ret;
+			using (nsAString str = new nsAString(value))
+			{
+				//if (!string.IsNullOrEmpty(value))
+				//	str.SetData(value);
+
+				ret = func( str );
+			}
+			return ret;
+		}
+
+
 	}
 
 	// TODO: see comments on class nsAString

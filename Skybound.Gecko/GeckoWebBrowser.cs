@@ -177,12 +177,10 @@ namespace Gecko
 			{
 				Xpcom.Initialize();
 				#if !NO_CUSTOM_PROMPT_SERVICE
-				PromptServiceFactory.Register();
+				PromptFactoryFactory.Register();
 				#endif
 				WindowCreator.Register();
-                LauncherDialogFactory.Register();
-				//CertificateDialogsFactory.Register();
-				//ToolTipTextProviderFactory.Register();
+                LauncherDialogFactory.Register();				
 				
 				WebBrowser = Xpcom.CreateInstance<nsIWebBrowser>("@mozilla.org/embedding/browser/nsWebBrowser;1");
 				WebBrowserFocus = (nsIWebBrowserFocus)WebBrowser;
@@ -190,19 +188,6 @@ namespace Gecko
 				WebNav = (nsIWebNavigation)WebBrowser;
 
 				WebBrowser.SetContainerWindowAttribute(this);
-				
-				//int type = ((this.ChromeFlags & (int)GeckoWindowFlags.OpenAsChrome) != 0) ? nsIDocShellTreeItemConstants.typeChromeWrapper : nsIDocShellTreeItemConstants.typeContentWrapper;
-				
-				//nsIDocShellTreeItem shellTreeItem = Xpcom.QueryInterface<nsIDocShellTreeItem>(WebBrowser);
-				//if (shellTreeItem != null)
-				//      shellTreeItem.SetItemType(type);
-				//else
-				//{
-				//      nsIDocShellTreeItem19 treeItem19 = Xpcom.QueryInterface<nsIDocShellTreeItem19>(WebBrowser);
-				//      if (treeItem19 != null)
-				//            treeItem19.SetItemType(type);
-				//}
-
 #if GTK
 				if (Xpcom.IsMono)
 					BaseWindow.InitWindow(m_wrapper.BrowserWindow.Handle, IntPtr.Zero, 0, 0, this.Width, this.Height);
@@ -407,23 +392,30 @@ namespace Gecko
 						}
 						return;
 					case WM_IME_SETCONTEXT:
-						//Console.WriteLine("WM_IME_SETCONTEXT {0} {1}", m.WParam, m.LParam.ToString("X8"));
-						if (m.WParam == IntPtr.Zero)
+						if (!DisableWmImeSetContext)
 						{
-							// zero
-							WebBrowserFocus.Deactivate();
+							//Console.WriteLine("WM_IME_SETCONTEXT {0} {1}", m.WParam, m.LParam.ToString("X8"));
+							if (m.WParam == IntPtr.Zero)
+							{
+								// zero
+								WebBrowserFocus.Deactivate();
+							}
+							else
+							{
+								// non-zero (1)
+								WebBrowserFocus.Activate();
+							}
+							return;
 						}
-						else
-						{
-							// non-zero (1)
-							WebBrowserFocus.Activate();				
-						} 
-						return;
+						break;
 				}
 			}
 
 			base.WndProc(ref m);
 		}
+
+
+		public bool DisableWmImeSetContext { get; set; }
 		#endregion
 		
 		#region Overridden Properties & Event Handlers Handlers
@@ -474,6 +466,10 @@ namespace Gecko
 			if (WebBrowserFocus != null)			
 				WebBrowserFocus.Activate();
 			
+#if GTK
+			m_wrapper.SetInputFocus();		
+#endif
+			
 			base.OnEnter(e);
 		}
 
@@ -481,6 +477,10 @@ namespace Gecko
 		{
 		      if (WebBrowserFocus != null && !IsBusy)
 		            WebBrowserFocus.Deactivate();
+			
+#if GTK
+			m_wrapper.RemoveInputFocus();		
+#endif
 		           
 		      base.OnLeave(e);
 		}
@@ -628,35 +628,6 @@ namespace Gecko
 		{
 			var bytes = System.Text.Encoding.UTF8.GetBytes(htmlDocument);						
 			Navigate(string.Format("data:text/html;base64,{0}", Convert.ToBase64String(bytes)));
-		}
-		
-		/// <summary>
-		/// Loads supplied html string Synchronously.
-		/// Loading html this way will not invoke the onload event.
-		/// Loading html this way will not handle link css files and possibly other css files.
-		/// Initiaizing a document this way is at least five times as fast as using LoadHtml.
-		/// </summary>
-		/// <param name="htmlDocument">the document to load.</param>
-		/// <returns>false if there was an error loading the document.</returns>
-		public bool LoadHtmlSynchronously(string htmlDocument)
-		{
-			using (AutoJSContext context = new AutoJSContext(this.JSContext))
-			{
-				string unusedResult;
-				bool scriptExecutedSuccessfully = context.EvaluateScript(
-				@"	document.open('text/html');
-					document.write('" + 
-									  htmlDocument.
-										Replace("\\", "\\\\").
-										Replace("'", "\\'").
-										Replace(System.Environment.NewLine.ToString(), "\\n").
-										Replace("\n", "\\n") +
-				@"'); 
-					document.close();
-				", out unusedResult);
-
-				return scriptExecutedSuccessfully;
-			}
 		}
 
 		/// <summary>
@@ -1203,16 +1174,10 @@ namespace Gecko
 				if (WebNav == null)
 					return null;
 
-				nsIURI locationComObject = WebNav.GetCurrentURIAttribute();				
-				nsURI location = new nsURI(locationComObject);
-				
-				if (!location.IsNull)
-				{
-					Uri result;
-					return Uri.TryCreate(location.Spec, UriKind.Absolute, out result) ? result : null;
-				}
-				
-				return new Uri("about:blank");
+				nsIURI locationComObject = WebNav.GetCurrentURIAttribute();
+
+				var uri=nsURI.ToUri( locationComObject );
+				return uri ?? new Uri( "about:blank" );
 			}
 		}
 		
@@ -1227,14 +1192,9 @@ namespace Gecko
 				if (WebNav == null)
 					return null;
 			
-				nsIURI location =  WebNav.GetReferringURIAttribute();				
-				
-				if (location != null)
-				{
-					return new Uri(nsString.Get(location.GetSpecAttribute));
-				}
-				
-				return new Uri("about:blank");
+				nsIURI location =  WebNav.GetReferringURIAttribute();
+				var uri = nsURI.ToUri(location);
+				return uri ?? new Uri("about:blank");				
 			}
 		}
 		
@@ -1281,12 +1241,23 @@ namespace Gecko
 		
 		private void UnloadDocument()
 		{
-			//if (_Document != null)
-			//{
-			//      FromDOMDocumentTable.Remove((nsIDOMDocument)_Document.DomObject);
-			//}
 			_Document = null;
 		}
+		
+		public void SetInputFocus()
+		{
+#if GTK
+			m_wrapper.SetInputFocus();		
+#endif
+		}
+		
+		public void RemoveInputFocus()
+		{
+#if GTK
+			m_wrapper.RemoveInputFocus();		
+#endif
+		}
+		
 		
 		#region public event GeckoNavigatingEventHandler Navigating
 		/// <summary>
@@ -1821,7 +1792,20 @@ namespace Gecko
 			browser.Dock = DockStyle.Fill;
 			form.Controls.Add(browser);
 			form.Load += delegate { browser.Navigate("view-source:" + url); };
-			form.Icon = FindForm().Icon;
+			try
+			{
+#warning when geckoFX is used in WPF application there are no forms. We should rewrite this code
+				var outerForm = FindForm();
+				if (outerForm != null)
+				{
+					form.Icon = outerForm.Icon;
+				}
+			}
+			catch ( Exception )
+			{
+
+			}
+			
 			form.ClientSize = this.ClientSize;
 			form.StartPosition = FormStartPosition.CenterParent;
 			form.Show();			

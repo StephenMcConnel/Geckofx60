@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Gecko;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.IO;
 
 // Tested with mono 2.6.3 and mono 2.8
 // Run this with the following command:
@@ -16,13 +17,17 @@ namespace GeckoFxTest
 		public static void Main(string[] args)
 		{
 #if GTK		
-			if (!Environment.GetEnvironmentVariable("LD_LIBRARY_PATH").Contains("/usr/lib/firefox-7.0/"))
-				throw new ApplicationException(String.Format("LD_LIBRARY_PATH must contain {0}", "/usr/lib/firefox-7.0/"));
+			if (!Environment.GetEnvironmentVariable("LD_LIBRARY_PATH").Contains("/usr/lib/firefox-9.0.1/"))
+				throw new ApplicationException(String.Format("LD_LIBRARY_PATH must contain {0}", "/usr/lib/firefox-9.0.1/"));
 
-			Xpcom.Initialize("/usr/lib/firefox-7.0/");
+			Xpcom.Initialize("/usr/lib/firefox-10.0/");
 #else
 			Xpcom.Initialize(@"c:\program Files (x86)\Mozilla Firefox 10.0\");
 #endif
+			Application.ApplicationExit += (sender, e) => 
+			{
+        		Xpcom.Shutdown();
+			};
 			
 			//Application.Idle += (s, e) => Console.WriteLine(SynchronizationContext.Current);
 			Application.Run(new MyForm());
@@ -103,7 +108,7 @@ namespace GeckoFxTest
 			tabPage.Text = "blank";
 			var browser = new GeckoWebBrowser();
 			browser.Dock = DockStyle.Fill;
-
+			browser.DisableWmImeSetContext = true;
 			tabPage.DockPadding.Top = 25;
 			tabPage.Dock = DockStyle.Fill;
 
