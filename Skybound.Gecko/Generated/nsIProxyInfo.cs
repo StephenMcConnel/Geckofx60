@@ -40,7 +40,7 @@ namespace Gecko
         /// This attribute specifies the hostname of the proxy server.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHost);
+		void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHost);
 		
 		/// <summary>
         /// This attribute specifies the port number of the proxy server.
@@ -62,7 +62,7 @@ namespace Gecko
         /// A future version of this interface may define additional types.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aType);
+		void GetTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aType);
 		
 		/// <summary>
         /// This attribute specifies flags that modify the proxy type.  The value of

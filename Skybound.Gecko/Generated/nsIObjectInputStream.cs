@@ -173,14 +173,14 @@ namespace Gecko
         /// 32-bit length field, followed by length 8-bit chars.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void ReadCString([MarshalAs(UnmanagedType.LPStruct)] nsACString retval);
+		new void ReadCString([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase retval);
 		
 		/// <summary>
         /// Read an 16-bit pascal style string from the stream.
         /// 32-bit length field, followed by length PRUnichars.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void ReadString([MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		new void ReadString([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		/// <summary>
         /// Read an opaque byte array from the stream.

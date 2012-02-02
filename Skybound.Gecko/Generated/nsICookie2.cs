@@ -42,13 +42,13 @@ namespace Gecko
         /// the name of the cookie
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aName);
+		new void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aName);
 		
 		/// <summary>
         /// the cookie value
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetValueAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aValue);
+		new void GetValueAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aValue);
 		
 		/// <summary>
         /// true if the cookie is a domain cookie, false otherwise
@@ -61,13 +61,13 @@ namespace Gecko
         /// the host (possibly fully qualified) of the cookie
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHost);
+		new void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHost);
 		
 		/// <summary>
         /// the path pertaining to the cookie
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPath);
+		new void GetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPath);
 		
 		/// <summary>
         /// true if the cookie was transmitted over ssl, false otherwise
@@ -104,7 +104,7 @@ namespace Gecko
         /// domain cookie.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetRawHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aRawHost);
+		void GetRawHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aRawHost);
 		
 		/// <summary>
         /// true if the cookie is a session cookie.

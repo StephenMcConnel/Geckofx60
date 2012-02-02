@@ -110,7 +110,7 @@ namespace Gecko
         /// '\n'.  Invalid character for data is '\0'.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void AnnotateCrashReport([MarshalAs(UnmanagedType.LPStruct)] nsACString key, [MarshalAs(UnmanagedType.LPStruct)] nsACString data);
+		void AnnotateCrashReport([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase key, [MarshalAs(UnmanagedType.LPStruct)] nsACStringBase data);
 		
 		/// <summary>
         /// Append some data to the "Notes" field, to be submitted with a crash report.
@@ -124,7 +124,7 @@ namespace Gecko
         /// The only invalid character is '\0'.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void AppendAppNotesToCrashReport([MarshalAs(UnmanagedType.LPStruct)] nsACString data);
+		void AppendAppNotesToCrashReport([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase data);
 		
 		/// <summary>
         /// Register a given memory range to be included in the crash report.
@@ -138,7 +138,7 @@ namespace Gecko
         /// @throw NS_ERROR_NOT_IMPLEMENTED if unavailable on the current OS
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void RegisterAppMemory(uint ptr, uint size);
+		void RegisterAppMemory(ulong ptr, ulong size);
 		
 		/// <summary>
         /// Write a minidump immediately, with the user-supplied exception

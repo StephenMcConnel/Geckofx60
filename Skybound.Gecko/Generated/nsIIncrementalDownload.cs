@@ -44,7 +44,7 @@ namespace Gecko
         /// The name of the request.  Often this is the URI of the request.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aName);
+		new void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aName);
 		
 		/// <summary>
         /// Indicates whether the request is pending. nsIRequest::isPending is
@@ -219,7 +219,7 @@ namespace Gecko
         /// This attribute has a value of -1 if the total size is unknown.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		int GetTotalSizeAttribute();
+		long GetTotalSizeAttribute();
 		
 		/// <summary>
         /// The current number of bytes downloaded so far.  This attribute is set just
@@ -229,7 +229,7 @@ namespace Gecko
         /// This attribute has a value of -1 if the current size is unknown.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		int GetCurrentSizeAttribute();
+		long GetCurrentSizeAttribute();
 		
 		/// <summary>
         /// Start the incremental download.

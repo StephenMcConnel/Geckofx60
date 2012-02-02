@@ -39,7 +39,7 @@ namespace Gecko
         /// </summary>
 		[return: MarshalAs(UnmanagedType.Interface)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		nsISupportsArray GetCSSStyleRules([MarshalAs(UnmanagedType.Interface)] nsIDOMElement aElement, [MarshalAs(UnmanagedType.LPStruct)] nsAString aPseudo);
+		nsISupportsArray GetCSSStyleRules([MarshalAs(UnmanagedType.Interface)] nsIDOMElement aElement, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aPseudo);
 		
 		/// <summary>Member GetRuleLine </summary>
 		/// <param name='aRule'> </param>
@@ -93,7 +93,7 @@ namespace Gecko
 		/// <param name='aElement'> </param>
 		/// <param name='aState'> </param>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetContentState([MarshalAs(UnmanagedType.Interface)] nsIDOMElement aElement, uint aState);
+		void SetContentState([MarshalAs(UnmanagedType.Interface)] nsIDOMElement aElement, ulong aState);
 		
 		/// <summary>Member GetUsedFontFaces </summary>
 		/// <param name='aRange'> </param>

@@ -142,13 +142,13 @@ namespace Gecko
         /// Set or get the title for a link item.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetUriTitleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aUriTitle);
+		void GetUriTitleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aUriTitle);
 		
 		/// <summary>
         /// Set or get the title for a link item.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetUriTitleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aUriTitle);
+		void SetUriTitleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aUriTitle);
 		
 		/// <summary>
         /// Get a 'privacy safe' unique string hash of the uri's
@@ -157,7 +157,7 @@ namespace Gecko
         /// the URI spec using nsICryptoHash.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetUriHashAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aUriHash);
+		void GetUriHashAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aUriHash);
 		
 		/// <summary>
         /// Compare this item's hash to another uri.

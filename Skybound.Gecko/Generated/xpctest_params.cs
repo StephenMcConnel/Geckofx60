@@ -57,7 +57,7 @@ namespace Gecko
 		int TestLong(int a, ref int b);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		int TestLongLong(int a, ref int b);
+		int TestLongLong(long a, ref long b);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
 		uint TestUnsignedShort(ushort a, ref ushort b);
@@ -66,7 +66,7 @@ namespace Gecko
 		uint TestUnsignedLong(uint a, ref uint b);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		uint TestUnsignedLongLong(uint a, ref uint b);
+		uint TestUnsignedLongLong(ulong a, ref ulong b);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
 		float TestFloat(float a, ref float b);
@@ -89,16 +89,16 @@ namespace Gecko
 		string TestWstring([MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "Gecko.CustomMarshalers.WStringMarshaler")] string a, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "Gecko.CustomMarshalers.WStringMarshaler")] ref string b);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void TestDOMString([MarshalAs(UnmanagedType.LPStruct)] nsAString a, [MarshalAs(UnmanagedType.LPStruct)] nsAString b, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void TestDOMString([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase a, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase b, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void TestAString([MarshalAs(UnmanagedType.LPStruct)] nsAString a, [MarshalAs(UnmanagedType.LPStruct)] nsAString b, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void TestAString([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase a, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase b, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void TestAUTF8String([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String a, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String b, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String retval);
+		void TestAUTF8String([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase a, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase b, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase retval);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void TestACString([MarshalAs(UnmanagedType.LPStruct)] nsACString a, [MarshalAs(UnmanagedType.LPStruct)] nsACString b, [MarshalAs(UnmanagedType.LPStruct)] nsACString retval);
+		void TestACString([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase a, [MarshalAs(UnmanagedType.LPStruct)] nsACStringBase b, [MarshalAs(UnmanagedType.LPStruct)] nsACStringBase retval);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
 		System.IntPtr TestJsval(System.IntPtr a, ref System.IntPtr b);

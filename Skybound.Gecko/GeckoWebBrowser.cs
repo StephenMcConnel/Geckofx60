@@ -159,6 +159,13 @@ namespace Gecko
 				return returnValue;
 			}
 		}
+		
+		// defaults to false
+		public bool UseHttpActivityObserver
+		{
+			get;
+			set;
+		}
 
 #if GTK
 		// Only used on Linux.
@@ -204,12 +211,15 @@ namespace Gecko
 				Guid nsIWebProgressListenerGUID = typeof(nsIWebProgressListener).GUID;
 				WebBrowser.AddWebBrowserListener(this, ref nsIWebProgressListenerGUID);
 
-                var observerService = Xpcom.GetService<nsIObserverService>("@mozilla.org/observer-service;1");
-                observerService.AddObserver(this, "http-on-modify-request", false);
+				if (UseHttpActivityObserver)
+				{
+					var observerService = Xpcom.GetService<nsIObserverService>("@mozilla.org/observer-service;1");
+					observerService.AddObserver(this, "http-on-modify-request", false);
 
-                nsIHttpActivityDistributor activityDistributor = Xpcom.GetService<nsIHttpActivityDistributor>("@mozilla.org/network/http-activity-distributor;1");
-                activityDistributor = Xpcom.QueryInterface<nsIHttpActivityDistributor>(activityDistributor);
-                activityDistributor.AddObserver(this);
+					nsIHttpActivityDistributor activityDistributor = Xpcom.GetService<nsIHttpActivityDistributor>("@mozilla.org/network/http-activity-distributor;1");
+					activityDistributor = Xpcom.QueryInterface<nsIHttpActivityDistributor>(activityDistributor);
+					activityDistributor.AddObserver(this);
+				}
 
 				nsIDOMEventTarget target = Xpcom.QueryInterface<nsIDOMWindow>(WebBrowser.GetContentDOMWindowAttribute()).GetWindowRootAttribute();
 				
@@ -229,6 +239,7 @@ namespace Gecko
 				target.AddEventListener(new nsAString("contextmenu"), this, true, true, 2);
 				target.AddEventListener(new nsAString("DOMMouseScroll"), this, true, true, 2);
 				target.AddEventListener(new nsAString("focus"), this, true, true, 2);
+				target.AddEventListener(new nsAString("blur"), this, true, true, 2);
 				// Load event added here rather than DOMDocument as DOMDocument recreated when navigating
 				// ths losing attached listener.
 				target.AddEventListener(new nsAString("load"), this, true, true, 2);
@@ -1390,7 +1401,7 @@ namespace Gecko
 				m_browser = browser;
 			}
 
-			public bool OnError(nsAUTF8String message, nsAUTF8String fileName, uint line, uint pos, uint flags, uint errnum, jsdIValue exc)
+			public bool OnError(nsAUTF8StringBase message, nsAUTF8StringBase fileName, uint line, uint pos, uint flags, uint errnum, jsdIValue exc)
 			{
 				var eventArgs = new JavascriptErrorEventArgs(message.ToString(), fileName.ToString(), line, pos, flags, errnum);
 				m_browser.OnJavascriptError(eventArgs);
@@ -2261,6 +2272,7 @@ namespace Gecko
 				case "contextmenu": OnDomContextMenu((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
 				case "DOMMouseScroll": OnDomMouseScroll((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
 				case "focus": OnDomFocus(ea = new GeckoDomEventArgs(e)); break;
+				case "blur": OnDomBlur(ea = new GeckoDomEventArgs(e)); break;
 				case "load": OnLoad(ea = new GeckoDomEventArgs(e)); break;
 				case "change": OnDomContentChanged(ea = new GeckoDomEventArgs(e)); break;
 
@@ -2528,6 +2540,24 @@ namespace Gecko
 		{
 			if (((GeckoDomEventHandler)this.Events[DomFocusEvent]) != null)
 				((GeckoDomEventHandler)this.Events[DomFocusEvent])(this, e);
+		}
+		#endregion
+
+		#region public event GeckoDomEventHandler DomBlur
+		[Category("DOM Events")]
+		public event GeckoDomEventHandler DomBlur
+		{
+			add { this.Events.AddHandler(DomBlurEvent, value); }
+			remove { this.Events.RemoveHandler(DomBlurEvent, value); }
+		}
+		private static object DomBlurEvent = new object();
+
+		/// <summary>Raises the <see cref="DomBlur"/> event.</summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnDomBlur(GeckoDomEventArgs e)
+		{
+			if (((GeckoDomEventHandler)this.Events[DomBlurEvent]) != null)
+				((GeckoDomEventHandler)this.Events[DomBlurEvent])(this, e);
 		}
 		#endregion
 
@@ -2951,9 +2981,9 @@ namespace Gecko
         public void ObserveActivity(nsISupports aHttpChannel,
                              UInt32 aActivityType,
                              UInt32 aActivitySubtype,
-                             UInt64 aTimestamp,
+                             Int64 aTimestamp,
                              UInt64 aExtraSizeData,
-							 nsACString aExtraStringData)
+							 nsACStringBase aExtraStringData)
         {
             nsIHttpChannel httpChannel = Xpcom.QueryInterface<nsIHttpChannel>(aHttpChannel);
 

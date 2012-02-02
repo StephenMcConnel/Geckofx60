@@ -41,50 +41,50 @@ namespace Gecko
         /// The issuing CA's organization.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetOrganizationAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aOrganization);
+		void GetOrganizationAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aOrganization);
 		
 		/// <summary>
         /// The issuing CA's organizational unit.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetOrganizationalUnitAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aOrganizationalUnit);
+		void GetOrganizationalUnitAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aOrganizationalUnit);
 		
 		/// <summary>
         /// The time this CRL was created at.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		ulong GetLastUpdateAttribute();
+		long GetLastUpdateAttribute();
 		
 		/// <summary>
         /// The time the suggested next update for this CRL.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		ulong GetNextUpdateAttribute();
+		long GetNextUpdateAttribute();
 		
 		/// <summary>
         /// lastUpdate formatted as a human readable string
         /// formatted according to the environment locale.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetLastUpdateLocaleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aLastUpdateLocale);
+		void GetLastUpdateLocaleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aLastUpdateLocale);
 		
 		/// <summary>
         /// nextUpdate formatted as a human readable string
         /// formatted according to the environment locale.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetNextUpdateLocaleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aNextUpdateLocale);
+		void GetNextUpdateLocaleAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aNextUpdateLocale);
 		
 		/// <summary>
         /// The key identifying the CRL in the database.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetNameInDbAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aNameInDb);
+		void GetNameInDbAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aNameInDb);
 		
 		/// <summary>
         /// The URL this CRL was last fetched from.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetLastFetchURLAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aLastFetchURL);
+		void GetLastFetchURLAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aLastFetchURL);
 	}
 }

@@ -79,7 +79,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSpec);
+		new void GetSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSpec);
 		
 		/// <summary>
         /// Returns a string representation of the URI. Setting the spec causes
@@ -94,7 +94,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSpec);
+		new void SetSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSpec);
 		
 		/// <summary>
         /// The prePath (eg. scheme://user:password@host:port) returns the string
@@ -103,7 +103,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetPrePathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPrePath);
+		new void GetPrePathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPrePath);
 		
 		/// <summary>
         /// The Scheme is the protocol to which this URI refers.  The scheme is
@@ -112,7 +112,7 @@ namespace Gecko
         /// that will generally lead to incorrect results.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aScheme);
+		new void GetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aScheme);
 		
 		/// <summary>
         /// The Scheme is the protocol to which this URI refers.  The scheme is
@@ -121,7 +121,7 @@ namespace Gecko
         /// that will generally lead to incorrect results.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aScheme);
+		new void SetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aScheme);
 		
 		/// <summary>
         /// The username:password (or username only if value doesn't contain a ':')
@@ -129,7 +129,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetUserPassAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aUserPass);
+		new void GetUserPassAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aUserPass);
 		
 		/// <summary>
         /// The username:password (or username only if value doesn't contain a ':')
@@ -137,7 +137,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetUserPassAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aUserPass);
+		new void SetUserPassAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aUserPass);
 		
 		/// <summary>
         /// The optional username and password, assuming the preHost consists of
@@ -146,7 +146,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetUsernameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aUsername);
+		new void GetUsernameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aUsername);
 		
 		/// <summary>
         /// The optional username and password, assuming the preHost consists of
@@ -155,21 +155,13 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetUsernameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aUsername);
+		new void SetUsernameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aUsername);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetPasswordAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPassword);
+		new void GetPasswordAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPassword);
 		
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetPasswordAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPassword);
-		
-		/// <summary>
-        /// The host:port (or simply the host, if port == -1).
-        ///
-        /// Characters are NOT escaped.
-        /// </summary>
-		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetHostPortAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHostPort);
+		new void SetPasswordAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPassword);
 		
 		/// <summary>
         /// The host:port (or simply the host, if port == -1).
@@ -177,7 +169,15 @@ namespace Gecko
         /// Characters are NOT escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetHostPortAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHostPort);
+		new void GetHostPortAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHostPort);
+		
+		/// <summary>
+        /// The host:port (or simply the host, if port == -1).
+        ///
+        /// Characters are NOT escaped.
+        /// </summary>
+		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
+		new void SetHostPortAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHostPort);
 		
 		/// <summary>
         /// The host is the internet domain name to which this URI refers.  It could
@@ -187,7 +187,7 @@ namespace Gecko
         /// Characters are NOT escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHost);
+		new void GetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHost);
 		
 		/// <summary>
         /// The host is the internet domain name to which this URI refers.  It could
@@ -197,7 +197,7 @@ namespace Gecko
         /// Characters are NOT escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aHost);
+		new void SetHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aHost);
 		
 		/// <summary>
         /// A port value of -1 corresponds to the protocol's default port (eg. -1
@@ -220,7 +220,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPath);
+		new void GetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPath);
 		
 		/// <summary>
         /// The path, typically including at least a leading '/' (but may also be
@@ -229,7 +229,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aPath);
+		new void SetPathAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aPath);
 		
 		/// <summary>
         /// URI equivalence test (not a strict string comparison).
@@ -263,7 +263,7 @@ namespace Gecko
         /// NOTE: some implementations may have no concept of a relative URI.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void Resolve([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String relativePath, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String retval);
+		new void Resolve([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase relativePath, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase retval);
 		
 		/// <summary>
         /// The URI spec with an ASCII compatible encoding.  Host portion follows
@@ -271,7 +271,7 @@ namespace Gecko
         /// RFC2396.  The result is strictly ASCII.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetAsciiSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aAsciiSpec);
+		new void GetAsciiSpecAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aAsciiSpec);
 		
 		/// <summary>
         /// The URI host with an ASCII compatible encoding.  Follows the IDNA
@@ -279,7 +279,7 @@ namespace Gecko
         /// ASCII for compatibility with existing internet infrasture.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetAsciiHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aAsciiHost);
+		new void GetAsciiHostAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aAsciiHost);
 		
 		/// <summary>
         /// The charset of the document from which this URI originated.  An empty
@@ -291,7 +291,7 @@ namespace Gecko
         /// characters.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetOriginCharsetAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aOriginCharset);
+		new void GetOriginCharsetAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aOriginCharset);
 		
 		/// <summary>
         /// Returns the reference portion (the part after the "#") of the URI.
@@ -300,7 +300,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aRef);
+		new void GetRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aRef);
 		
 		/// <summary>
         /// Returns the reference portion (the part after the "#") of the URI.
@@ -309,7 +309,7 @@ namespace Gecko
         /// Some characters may be escaped.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void SetRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aRef);
+		new void SetRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aRef);
 		
 		/// <summary>
         /// URI equivalence test (not a strict string comparison), ignoring
@@ -333,7 +333,7 @@ namespace Gecko
         /// returns a string for the current URI with the ref element cleared.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetSpecIgnoringRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSpecIgnoringRef);
+		new void GetSpecIgnoringRefAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSpecIgnoringRef);
 		
 		/// <summary>
         /// Returns if there is a reference portion (the part after the "#") of the URI.
@@ -381,7 +381,7 @@ namespace Gecko
         /// The stock icon name requested from the OS.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetStockIconAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aStockIcon);
+		void GetStockIconAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aStockIcon);
 		
 		/// <summary>
         /// iconSize
@@ -389,7 +389,7 @@ namespace Gecko
         /// The stock icon size requested from the OS.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetIconSizeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aIconSize);
+		void GetIconSizeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aIconSize);
 		
 		/// <summary>
         /// iconState
@@ -397,7 +397,7 @@ namespace Gecko
         /// The stock icon state requested from the OS.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetIconStateAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aIconState);
+		void GetIconStateAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aIconState);
 		
 		/// <summary>
         /// contentType
@@ -405,7 +405,7 @@ namespace Gecko
         /// A valid mime type, or the empty string.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetContentTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aContentType);
+		void GetContentTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aContentType);
 		
 		/// <summary>
         /// contentType
@@ -413,7 +413,7 @@ namespace Gecko
         /// A valid mime type, or the empty string.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetContentTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aContentType);
+		void SetContentTypeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aContentType);
 		
 		/// <summary>
         /// fileExtension
@@ -421,6 +421,6 @@ namespace Gecko
         /// The file extension of the file which we are looking up.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetFileExtensionAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aFileExtension);
+		void GetFileExtensionAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aFileExtension);
 	}
 }

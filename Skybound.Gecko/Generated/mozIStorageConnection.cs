@@ -120,7 +120,7 @@ namespace Gecko
         /// operation.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		int GetLastInsertRowIDAttribute();
+		long GetLastInsertRowIDAttribute();
 		
 		/// <summary>
         /// The last error SQLite error code.
@@ -133,7 +133,7 @@ namespace Gecko
         /// sqlite library).
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetLastErrorStringAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aLastErrorString);
+		void GetLastErrorStringAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aLastErrorString);
 		
 		/// <summary>
         /// The schema version of the database.  This should not be used until the
@@ -160,7 +160,7 @@ namespace Gecko
         /// @return a new mozIStorageStatement
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		mozIStorageStatement CreateStatement([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSQLStatement);
+		mozIStorageStatement CreateStatement([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSQLStatement);
 		
 		/// <summary>
         /// Create an asynchronous statement (mozIStorageAsyncStatement) for the given
@@ -177,7 +177,7 @@ namespace Gecko
         /// @return a new mozIStorageAsyncStatement
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		mozIStorageAsyncStatement CreateAsyncStatement([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSQLStatement);
+		mozIStorageAsyncStatement CreateAsyncStatement([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSQLStatement);
 		
 		/// <summary>
         /// Execute a SQL expression, expecting no arguments.
@@ -185,7 +185,7 @@ namespace Gecko
         /// @param aSQLStatement  The SQL statement to execute
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void ExecuteSimpleSQL([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSQLStatement);
+		void ExecuteSimpleSQL([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSQLStatement);
 		
 		/// <summary>
         /// Execute an array of queries created with this connection asynchronously
@@ -218,7 +218,7 @@ namespace Gecko
         /// </summary>
 		[return: MarshalAs(UnmanagedType.U1)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		bool TableExists([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aTableName);
+		bool TableExists([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aTableName);
 		
 		/// <summary>
         /// Check if the given index exists.
@@ -228,7 +228,7 @@ namespace Gecko
         /// </summary>
 		[return: MarshalAs(UnmanagedType.U1)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		bool IndexExists([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aIndexName);
+		bool IndexExists([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aIndexName);
 		
 		/// <summary>
         /// Returns true if a transaction is active on this connection.
@@ -302,7 +302,7 @@ namespace Gecko
         /// in question.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void CreateFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aFunctionName, int aNumArguments, mozIStorageFunction aFunction);
+		void CreateFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aFunctionName, int aNumArguments, mozIStorageFunction aFunction);
 		
 		/// <summary>
         /// Create a new SQL aggregate function.  If you use your connection on
@@ -319,7 +319,7 @@ namespace Gecko
         /// function in question.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void CreateAggregateFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aFunctionName, int aNumArguments, mozIStorageAggregateFunction aFunction);
+		void CreateAggregateFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aFunctionName, int aNumArguments, mozIStorageAggregateFunction aFunction);
 		
 		/// <summary>
         /// Delete custom SQL function (simple or aggregate one).
@@ -328,7 +328,7 @@ namespace Gecko
         /// The name of function to remove.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void RemoveFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aFunctionName);
+		void RemoveFunction([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aFunctionName);
 		
 		/// <summary>
         /// Sets a progress handler. Only one handler can be registered at a time.
@@ -369,6 +369,6 @@ namespace Gecko
         /// If the system is short on storage space.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetGrowthIncrement(int aIncrement, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aDatabaseName);
+		void SetGrowthIncrement(int aIncrement, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aDatabaseName);
 	}
 }

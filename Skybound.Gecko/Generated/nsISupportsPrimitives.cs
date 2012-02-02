@@ -106,13 +106,13 @@ namespace Gecko
         /// Scriptable storage for ASCII strings
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aData);
+		void GetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aData);
 		
 		/// <summary>
         /// Scriptable storage for ASCII strings
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aData);
+		void SetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aData);
 		
 		[return: MarshalAs(UnmanagedType.LPStr)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
@@ -141,13 +141,13 @@ namespace Gecko
         /// Scriptable storage for Unicode strings
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aData);
+		void GetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aData);
 		
 		/// <summary>
         /// Scriptable storage for Unicode strings
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aData);
+		void SetDataAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aData);
 		
 		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "Gecko.CustomMarshalers.WStringMarshaler")]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
@@ -352,13 +352,13 @@ namespace Gecko
         /// Scriptable storage for NSPR date/time values
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		ulong GetDataAttribute();
+		long GetDataAttribute();
 		
 		/// <summary>
         /// Scriptable storage for NSPR date/time values
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetDataAttribute(ulong aData);
+		void SetDataAttribute(long aData);
 		
 		[return: MarshalAs(UnmanagedType.LPStr)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]

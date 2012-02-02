@@ -176,7 +176,7 @@ namespace Gecko
 		/// <summary>Member GetNameAttribute </summary>
 		/// <param name='aName'> </param>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAString aName);
+		void GetNameAttribute([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase aName);
 	}
 	
 	/// <summary>nsIWebGLUniformLocation </summary>
@@ -270,7 +270,7 @@ namespace Gecko
 		/// <param name='index'> </param>
 		/// <param name='name'> </param>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void BindAttribLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, uint index, [MarshalAs(UnmanagedType.LPStruct)] nsAString name);
+		void BindAttribLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, uint index, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase name);
 		
 		/// <summary>Member BindBuffer </summary>
 		/// <param name='target'> </param>
@@ -639,7 +639,7 @@ namespace Gecko
 		/// <param name='name'> </param>
 		/// <returns>A System.Int32</returns>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		int GetAttribLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAString name);
+		int GetAttribLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase name);
 		
 		/// <summary>Member GetParameter </summary>
 		/// <param name='pname'> </param>
@@ -678,7 +678,7 @@ namespace Gecko
         /// Modified: void glGetProgramInfoLog(WebGLuint program, WebGLsizei bufsize, WebGLsizei* length, char* infolog);
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetProgramInfoLog([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void GetProgramInfoLog([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		/// <summary>
         ///nsIWebGLIntArray getRenderbufferParameteriv(in WebGLenum target, in WebGLenum pname);
@@ -699,13 +699,13 @@ namespace Gecko
         /// Modified: void glGetShaderInfoLog(WebGLuint shader, WebGLsizei bufsize, WebGLsizei* length, char* infolog);
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetShaderInfoLog([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void GetShaderInfoLog([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		/// <summary>
         ///void glGetShaderPrecisionFormat(WebGLenum shadertype, WebGLenum precisiontype, WebGLint* range, WebGLint* precision);
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void GetShaderSource([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void GetShaderSource([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		/// <summary>Member GetTexParameter </summary>
 		/// <param name='target'> </param>
@@ -729,7 +729,7 @@ namespace Gecko
 		/// <returns>A nsIWebGLUniformLocation</returns>
 		[return: MarshalAs(UnmanagedType.Interface)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		nsIWebGLUniformLocation GetUniformLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAString name);
+		nsIWebGLUniformLocation GetUniformLocation([MarshalAs(UnmanagedType.Interface)] nsIWebGLProgram program, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase name);
 		
 		/// <summary>Member GetVertexAttrib </summary>
 		/// <param name='index'> </param>
@@ -855,7 +855,7 @@ namespace Gecko
         /// Modified: void glShaderSource(WebGLuint shader, WebGLsizei count, const char** string, const WebGLint* length);
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void ShaderSource([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAString source);
+		void ShaderSource([MarshalAs(UnmanagedType.Interface)] nsIWebGLShader shader, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase source);
 		
 		/// <summary>Member StencilFunc </summary>
 		/// <param name='func'> </param>
@@ -1273,14 +1273,14 @@ namespace Gecko
         /// the underlying renderer to the user.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void MozGetUnderlyingParamString(uint pname, [MarshalAs(UnmanagedType.LPStruct)] nsAString retval);
+		void MozGetUnderlyingParamString(uint pname, [MarshalAs(UnmanagedType.LPStruct)] nsAStringBase retval);
 		
 		/// <summary>
         /// extensions
         /// </summary>
 		[return: MarshalAs(UnmanagedType.Interface)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		nsIWebGLExtension GetExtension([MarshalAs(UnmanagedType.LPStruct)] nsAString name);
+		nsIWebGLExtension GetExtension([MarshalAs(UnmanagedType.LPStruct)] nsAStringBase name);
 		
 		/// <summary>Member GetSupportedExtensions </summary>
 		/// <returns>A nsIVariant</returns>

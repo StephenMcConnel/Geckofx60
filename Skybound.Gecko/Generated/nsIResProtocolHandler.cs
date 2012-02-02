@@ -40,7 +40,7 @@ namespace Gecko
         /// The scheme of this protocol (e.g., "file").
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new void GetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACString aScheme);
+		new void GetSchemeAttribute([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase aScheme);
 		
 		/// <summary>
         /// The default port is the port that this protocol normally uses.
@@ -83,7 +83,7 @@ namespace Gecko
         /// </summary>
 		[return: MarshalAs(UnmanagedType.Interface)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		new nsIURI NewURI([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String aSpec, [MarshalAs(UnmanagedType.LPStr)] string aOriginCharset, [MarshalAs(UnmanagedType.Interface)] nsIURI aBaseURI);
+		new nsIURI NewURI([MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase aSpec, [MarshalAs(UnmanagedType.LPStr)] string aOriginCharset, [MarshalAs(UnmanagedType.Interface)] nsIURI aBaseURI);
 		
 		/// <summary>
         /// Constructs a new channel from the given URI for this protocol handler.
@@ -115,7 +115,7 @@ namespace Gecko
         /// enforced.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void SetSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACString root, [MarshalAs(UnmanagedType.Interface)] nsIURI baseURI);
+		void SetSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase root, [MarshalAs(UnmanagedType.Interface)] nsIURI baseURI);
 		
 		/// <summary>
         /// Gets the substitution for the root key.
@@ -124,14 +124,14 @@ namespace Gecko
         /// </summary>
 		[return: MarshalAs(UnmanagedType.Interface)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		nsIURI GetSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACString root);
+		nsIURI GetSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase root);
 		
 		/// <summary>
         /// Returns TRUE if the substitution exists and FALSE otherwise.
         /// </summary>
 		[return: MarshalAs(UnmanagedType.U1)]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		bool HasSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACString root);
+		bool HasSubstitution([MarshalAs(UnmanagedType.LPStruct)] nsACStringBase root);
 		
 		/// <summary>
         /// Utility function to resolve a resource URI.  A resolved URI is not
@@ -141,6 +141,6 @@ namespace Gecko
         /// @throws NS_ERROR_NOT_AVAILABLE if resURI.host() is an unknown root key.
         /// </summary>
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-		void ResolveURI([MarshalAs(UnmanagedType.Interface)] nsIURI resURI, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8String retval);
+		void ResolveURI([MarshalAs(UnmanagedType.Interface)] nsIURI resURI, [MarshalAs(UnmanagedType.LPStruct)] nsAUTF8StringBase retval);
 	}
 }
