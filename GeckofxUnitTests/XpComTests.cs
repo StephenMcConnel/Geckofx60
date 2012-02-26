@@ -18,7 +18,7 @@ namespace GeckofxUnitTests
 			{ 
 				if (Xpcom.IsLinux)
 					return "/usr/lib/firefox-9.0.1/";
-
+				
 				if (Directory.Exists(@"c:\program Files (x86)\Mozilla Firefox 10.0\"))
 				{
 					return @"c:\program Files (x86)\Mozilla Firefox 10.0\";
@@ -1670,6 +1670,14 @@ namespace GeckofxUnitTests
 		public void GetJsSubscriptLoader_CleanXpComInstance_ReturnsValidInstance()
 		{
 			var instance = Xpcom.GetService<mozIJSSubScriptLoader>("@mozilla.org/moz/jssubscript-loader;1");
+			Assert.IsNotNull(instance);
+			Marshal.ReleaseComObject(instance);
+		}
+
+		[Test]
+		public void GetUpdateManager_CleanXpComInstance_ReturnsValidInstance()
+		{
+			var instance = Xpcom.GetService<nsIUpdateManager>("@mozilla.org/updates/update-manager;1");
 			Assert.IsNotNull(instance);
 			Marshal.ReleaseComObject(instance);
 		}
