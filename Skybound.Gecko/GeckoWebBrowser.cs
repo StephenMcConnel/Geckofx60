@@ -38,6 +38,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
@@ -491,7 +492,7 @@ namespace Gecko
 		}
 
 
-
+		[Obsolete]
 		public NavigateFinishedNotifier NavigateFinishedNotifier;
 		
 		/// <summary>
@@ -1410,7 +1411,7 @@ namespace Gecko
 		}
 	
 		unsafe void nsIEmbeddingSiteWindow.GetDimensions(uint flags, int* x, int* y, int* cx, int* cy)
-		{
+		{			
 			int localX = (x != (void*)0) ? *x : 0;
 			int localY = (y != (void*)0) ? *y : 0;
 			int localCX = 0;
@@ -1418,26 +1419,26 @@ namespace Gecko
 			if (!IsDisposed)
 			{
 
-				if ( ( flags & nsIEmbeddingSiteWindowConstants.DIM_FLAGS_POSITION ) != 0 )
-				{
-					Point pt = PointToScreen( Point.Empty );
+			if ((flags & nsIEmbeddingSiteWindowConstants.DIM_FLAGS_POSITION) != 0)
+			{
+				Point pt = PointToScreen(Point.Empty);
 					localX = pt.X;
 					localY = pt.Y;
-				}
-
-				
+			}
+			
+			
 
 				
 				localCX = ClientSize.Width;
 				localCY = ClientSize.Height;
-
-				if ( ( this.ChromeFlags & ( int ) GeckoWindowFlags.OpenAsChrome ) != 0 )
-				{
+			
+			if ((this.ChromeFlags & (int)GeckoWindowFlags.OpenAsChrome) != 0)
+			{
 					BaseWindow.GetSize(ref localCX, ref localCY);
-				}
-
-				if ( ( flags & nsIEmbeddingSiteWindowConstants.DIM_FLAGS_SIZE_INNER ) == 0 )
-				{
+			}
+			
+			if ((flags & nsIEmbeddingSiteWindowConstants.DIM_FLAGS_SIZE_INNER) == 0)
+			{
 					Control topLevel = TopLevelControl;
 					if (topLevel != null)
 					{
@@ -1445,8 +1446,8 @@ namespace Gecko
 						localCX += nonClient.Width;
 						localCY += nonClient.Height;
 					}
-				}
-			}
+			}			
+		}
 		}
 
 		void nsIEmbeddingSiteWindow.SetFocus()
@@ -1606,6 +1607,7 @@ namespace Gecko
 
 		void nsIWebProgressListener.OnLocationChange(nsIWebProgress aWebProgress, nsIRequest aRequest, nsIURI aLocation)
 		{
+			if (IsDisposed) return;
 			// make sure we're loading the top-level window
 			nsIDOMWindow domWindow = aWebProgress.GetDOMWindowAttribute();
 			if (domWindow != null)
@@ -1966,7 +1968,7 @@ namespace Gecko
 
 		public nsIWeakReference GetWeakReference()
 		{
-			return new nsWeakReference( this );
+			return nsWeakReference.Create( this );
 		}
 	}
 	
