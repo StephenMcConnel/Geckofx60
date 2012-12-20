@@ -38,8 +38,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using GeckoFX.Microsoft;
+using Gecko.Interop;
 using System.Threading;
+using Gecko.Windows;
 
 
 // XpCom function are declared like
@@ -555,6 +556,45 @@ namespace Gecko
 				
 		}
 
+		internal static void DisposeObject<T>(ref T obj)
+			where T :class ,IDisposable
+		{
+			// take it to local variable
+			var localObj = Interlocked.Exchange(ref obj, null);
+			// if it is already null -> return
+			if (localObj == null) return;
+			// Dispose
+			localObj.Dispose();
+		}
+
+		internal static void FreeComObject<T>(ref T obj)
+			where T : class
+		{
+#if false
+			// When debug -> use special version, that writes debug information
+			ComDebug.DebugFreeComObject( ref obj );
+#else	
+			// take it to local variable
+			var localObj = Interlocked.Exchange(ref obj, null);
+			// if it is already null -> return
+			if (localObj == null) return;
+			Marshal.ReleaseComObject(localObj);
+#endif
+		}
+
+		
+
+		internal static void FinalFreeComObject<T>(ref T obj)
+			where T : class
+		{
+			// take it to local variable
+			var localObj = Interlocked.Exchange(ref obj, null);
+			// if it is already null -> return
+			if (localObj == null) return;
+			// release
+			Marshal.FinalReleaseComObject(localObj);
+		}
+
 		#region Internal class & interface declarations
 		#region QI_nsIInterfaceRequestor	
 		/// <summary>
@@ -579,7 +619,7 @@ namespace Gecko
 		{
 			public nsIFile GetFile(string prop, ref bool persistent)
 			{
-				if (prop == "ProfD")
+				if (prop == "ProfD" || prop == "ProfLD")
 				{
 					return (nsIFile)NewNativeLocalFile(ProfileDirectory ?? "");
 				}
@@ -587,6 +627,27 @@ namespace Gecko
 			}
 		}
 		#endregion
+
+		public static class Time
+		{
+			private static readonly DateTime _utcLinuxStartEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+			public static DateTime EpochStart
+			{
+				get { return _utcLinuxStartEpoch; }
+			}
+
+			public static DateTime FromSecondsSinceEpoch(uint time)
+			{
+				return _utcLinuxStartEpoch.AddSeconds(time);
+			}
+
+			public static uint ToSecondsSinceEpoch(DateTime time)
+			{
+				return (uint)(time.ToUniversalTime() - _utcLinuxStartEpoch).Seconds;
+			}
+		}
+
 		#endregion
 	}
 }

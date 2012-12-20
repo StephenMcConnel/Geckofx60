@@ -44,12 +44,18 @@ namespace Gecko
 	/// </summary>
 	public class GeckoSelection
 	{
-		internal GeckoSelection(nsISelection selection)
+		private GeckoSelection(nsISelection selection)
 		{
-			if (selection == null)
-				throw new ArgumentException("selection");
+			// selection is always NOT null, when we use Create function
+			//if (selection == null)
+			//	throw new ArgumentException("selection");
 
 			this.Selection = selection;
+		}
+
+		internal static GeckoSelection Create(nsISelection selection)
+		{
+			return selection == null ? null : new GeckoSelection( selection );
 		}
 		
 		/// <summary>

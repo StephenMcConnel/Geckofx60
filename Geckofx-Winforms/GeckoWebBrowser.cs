@@ -153,7 +153,7 @@ namespace Gecko
 					var webNav = Xpcom.QueryInterface<nsIWebNavigation>( WebNav );
 					if ( webNav != null )
 					{
-						webNav.Stop( nsIWebNavigationConstants.STOP_ALL );
+						webNav.Stop((int) nsIWebNavigationConsts.STOP_ALL );
 						Marshal.ReleaseComObject( webNav );
 					}
 					WebNav = null;
@@ -432,10 +432,23 @@ namespace Gecko
 				referrerUri = IOService.CreateNsIUri( referrer );
 			}
 
+			ClearCachedCOMPtrs();
+
 			WebNav.LoadURI(url, (uint)loadFlags, referrerUri, postData != null ? postData.InputStream : null, headers != null ? headers.InputStream : null);
 
 			return true;
 		}
+
+		/// <summary>
+		/// A Naviagation causes cached COM Ptrs to document objects to be invalid.
+		/// This method is called before LoadURI and reset all cached COM Ptrs to null.
+		/// </summary>
+		void ClearCachedCOMPtrs()
+		{
+			_MarkupDocumentViewer = null;
+		}
+
+
 		#endregion
 
 		/// <summary>
@@ -457,32 +470,7 @@ namespace Gecko
 		public void LoadBase64EncodedData(string type, string data)
 		{
 			var bytes = System.Text.Encoding.UTF8.GetBytes(data);
-			Navigate(string.Format("data:{0};base64,{1}", type, Convert.ToBase64String(bytes)));
-		}
-
-		/// <summary>
-		/// Return a Bitmap Image of the current WebBrowsers Rendered page.
-		/// Not supported on Linux - use OffScreenGeckoWebBrowser.
-		/// </summary>
-		/// <param name="width">Width of the bimap</param>
-		/// <param name="height">Height of the bitmap</param>
-		/// <returns></returns>
-		public Bitmap GetBitmap(uint width, uint height)
-		{
-			return GetBitmap(0, 0, width, height);
-		}
-
-		/// <summary>
-		/// Return a Bitmap Image of the current WebBrowsers Rendered page.
-		/// </summary>
-		/// <param name="xOffset"></param>
-		/// <param name="yOffset"></param>
-		/// <param name="width">Width of the bitmap</param>
-		/// <param name="height">Height of the bitmap</param>
-		/// <returns></returns>
-		public Bitmap GetBitmap(uint xOffset, uint yOffset, uint width, uint height)
-		{			
-			return new ImageCreator(this).CanvasGetBitmap(xOffset, yOffset, width, height);
+			Navigate( string.Concat( "data:", type, ";base64,", Convert.ToBase64String( bytes ) ) );
 		}
 
 
@@ -618,7 +606,7 @@ namespace Gecko
 		public void Stop()
 		{
 			if (WebNav != null)
-				WebNav.Stop(nsIWebNavigationConstants.STOP_ALL);
+				WebNav.Stop((int)nsIWebNavigationConsts.STOP_ALL);
 		}
 		
 		/// <summary>
@@ -1093,7 +1081,7 @@ namespace Gecko
 				if (WebNav == null)
 					return null;
 				
-				return (_History == null) ? (_History = new GeckoSessionHistory(WebNav)) : _History;
+				return _History ?? (_History = new GeckoSessionHistory(WebNav));
 			}
 		}
 		GeckoSessionHistory _History;
@@ -1663,6 +1651,11 @@ namespace Gecko
 				}
 			}
 			#endregion STATE_STOP
+
+			if (domWindow!=null)
+			{
+				domWindow.Dispose();
+			}
 		}
 
 		void nsIWebProgressListener.OnProgressChange(nsIWebProgress aWebProgress, nsIRequest aRequest, int aCurSelfProgress, int aMaxSelfProgress, int aCurTotalProgress, int aMaxTotalProgress)
@@ -1681,14 +1674,15 @@ namespace Gecko
 			if (IsDisposed) return;
 
 			Uri uri = new Uri(nsString.Get(aLocation.GetSpecAttribute));
-			var domWindow = GeckoWindow.Create(aWebProgress.GetDOMWindowAttribute());
+			using ( var domWindow = GeckoWindow.Create( aWebProgress.GetDOMWindowAttribute() ) )
+			{
 
-			bool sameDocument = (flags & nsIWebProgressListenerConstants.LOCATION_CHANGE_SAME_DOCUMENT) != 0;
-			bool errorPage = (flags & nsIWebProgressListenerConstants.LOCATION_CHANGE_ERROR_PAGE) != 0;
-			var ea = new GeckoNavigatedEventArgs(uri, aRequest, domWindow, sameDocument, errorPage);
+				bool sameDocument = ( flags & nsIWebProgressListenerConstants.LOCATION_CHANGE_SAME_DOCUMENT ) != 0;
+				bool errorPage = ( flags & nsIWebProgressListenerConstants.LOCATION_CHANGE_ERROR_PAGE ) != 0;
+				var ea = new GeckoNavigatedEventArgs( uri, aRequest, domWindow, sameDocument, errorPage );
 
-			OnNavigated(ea);
-
+				OnNavigated( ea );
+			}
 			UpdateCommandStatus();
 		}
 
@@ -1786,14 +1780,17 @@ namespace Gecko
 				OnProgressChanged(new GeckoProgressEventArgs(aCurTotalProgress, aMaxTotalProgress));
 		}
 
-		bool nsIWebProgressListener2.OnRefreshAttempted(nsIWebProgress aWebProgress, nsIURI aRefreshURI, int aMillis, bool aSameURI)
+		bool nsIWebProgressListener2.OnRefreshAttempted( nsIWebProgress aWebProgress, nsIURI aRefreshURI, int aMillis, bool aSameURI )
 		{
-			Uri destUri = new Uri(nsString.Get(aRefreshURI.GetSpecAttribute));
-			var domWindow = GeckoWindow.Create(aWebProgress.GetDOMWindowAttribute());
-
-			GeckoNavigatingEventArgs ea = new GeckoNavigatingEventArgs(destUri, domWindow);
+			Uri destUri = new Uri( nsString.Get( aRefreshURI.GetSpecAttribute ) );
+			bool cancel = false;
+			using ( var domWindow = GeckoWindow.Create( aWebProgress.GetDOMWindowAttribute() ) )
+			{
+				GeckoNavigatingEventArgs ea = new GeckoNavigatingEventArgs( destUri, domWindow );
+				cancel = ea.Cancel;
+			}
 			//OnRefreshAttempt();
-			return !ea.Cancel;
+			return !cancel;
 		}
 
 		#endregion
@@ -1803,56 +1800,112 @@ namespace Gecko
 
 		void nsIDOMEventListener.HandleEvent(nsIDOMEvent e)
 		{
+			if (e == null) return;
+
 			string type = nsString.Get( e.GetTypeAttribute );
-			
-			GeckoDomEventArgs ea = null;
-			
-			switch (type)
+
+			DomEventArgs ea = DomEventArgs.Create( e );
+
+			switch ( type )
 			{
-				case "keydown": OnDomKeyDown((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
-				case "keyup": OnDomKeyUp((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
-				case "keypress": OnDomKeyPress((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
-				
-				case "mousedown": OnDomMouseDown((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
-				case "mouseup": OnDomMouseUp((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
-				case "mousemove": OnDomMouseMove((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
-				case "mouseover": OnDomMouseOver((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
-				case "mouseout": OnDomMouseOut((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
-				case "click": OnDomClick(ea = new GeckoDomEventArgs(e)); break;
-				case "dblclick": OnDomDoubleClick(ea = new GeckoDomEventArgs(e)); break;
-				case "submit": OnDomSubmit(ea = new GeckoDomEventArgs(e)); break;
-				case "compositionstart": OnDomCompositionStart(ea = new GeckoDomEventArgs(e)); break;
-				case "compositionend": OnDomCompositionEnd(ea = new GeckoDomEventArgs(e)); break;
-				case "contextmenu": OnDomContextMenu((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
-				case "DOMMouseScroll": OnDomMouseScroll((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
-				case "focus": OnDomFocus(ea = new GeckoDomEventArgs(e)); break;
-				case "blur": OnDomBlur(ea = new GeckoDomEventArgs(e)); break;
-				case "load": OnLoad(ea = new GeckoDomEventArgs(e)); break;
-				case "change": OnDomContentChanged(ea = new GeckoDomEventArgs(e)); break;
-				case "hashchange": OnHashChange(ea = new GeckoDomEventArgs(e)); break;
-				case "dragstart": OnDomDragStart((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "dragenter": OnDomDragEnter((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "dragover": OnDomDragOver((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "dragleave": OnDomDragLeave((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "drag": OnDomDrag((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "drop": OnDomDrop((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-				case "dragend": OnDomDragEnd((GeckoDomDragEventArgs)(ea = new GeckoDomDragEventArgs((nsIDOMDragEvent)e))); break;
-
-				default:
-					Action<string> action;
-					if(_messageEventListeners.TryGetValue(type, out action))
-					{
-
-						action.Invoke(new GeckoDomMessageEventArgs((nsIDOMMessageEvent)e).Message);
-					}
+				case "keydown":
+					OnDomKeyDown( ( DomKeyEventArgs ) ea );
+					break;
+				case "keyup":
+					OnDomKeyUp( ( DomKeyEventArgs ) ea );
+					break;
+				case "keypress":
+					OnDomKeyPress( ( DomKeyEventArgs ) ea );
+					break;
+				case "mousedown":
+					OnDomMouseDown( ( DomMouseEventArgs ) ea );
+					break;
+				case "mouseup":
+					OnDomMouseUp( ( DomMouseEventArgs ) ea );
+					break;
+				case "mousemove":
+					OnDomMouseMove( ( DomMouseEventArgs ) ea );
+					break;
+				case "mouseover":
+					OnDomMouseOver( ( DomMouseEventArgs ) ea );
+					break;
+				case "mouseout":
+					OnDomMouseOut( ( DomMouseEventArgs ) ea );
+					break;
+				case "click":
+					OnDomClick( ea );
+					break;
+				case "dblclick":
+					OnDomDoubleClick( ea );
+					break;
+				case "submit":
+					OnDomSubmit( ea );
+					break;
+				case "compositionstart":
+					OnDomCompositionStart( ea );
+					break;
+				case "compositionend":
+					OnDomCompositionEnd( ea );
+					break;
+				case "contextmenu":
+					OnDomContextMenu( ( DomMouseEventArgs ) ea );
+					break;
+				case "DOMMouseScroll":
+					OnDomMouseScroll( ( DomMouseEventArgs ) ea );
+					break;
+				case "focus":
+					OnDomFocus( ea );
+					break;
+				case "blur":
+					OnDomBlur( ea );
+					break;
+				case "load":
+					OnLoad( ea );
+					break;
+				case "DOMContentLoaded":
+					OnDOMContentLoaded( ea );
+					break;
+				case "change":
+					OnDomContentChanged( ea );
+					break;
+				case "hashchange":
+					OnHashChange( (DomHashChangeEventArgs)ea );
+					break;
+				case "dragstart":
+					OnDomDragStart( ( DomDragEventArgs ) ea );
+					break;
+				case "dragenter":
+					OnDomDragEnter( ( DomDragEventArgs ) ea );
+					break;
+				case "dragover":
+					OnDomDragOver( ( DomDragEventArgs ) ea );
+					break;
+				case "dragleave":
+					OnDomDragLeave( ( DomDragEventArgs ) ea );
+					break;
+				case "drag":
+					OnDomDrag( ( DomDragEventArgs ) ea );
+					break;
+				case "drop":
+					OnDomDrop( ( DomDragEventArgs ) ea );
+					break;
+				case "dragend":
+					OnDomDragEnd( ( DomDragEventArgs ) ea );
 					break;
 			}
-			
-			
+			if (ea is DomMessageEventArgs)
+			{
+				Action<string> action;
+				DomMessageEventArgs mea = ( DomMessageEventArgs ) ea;
+				if (_messageEventListeners.TryGetValue(type, out action))
+				{
+					action.Invoke( mea.Message );
+				}
+			}
 
-			if (ea != null && ea.Cancelable && ea.Handled)
+			if ( ea != null && ea.Cancelable && ea.Handled )
 				e.PreventDefault();
-			
+
 		}
 
 		#endregion
