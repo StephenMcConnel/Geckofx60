@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Gecko.Interop;
 
 namespace Gecko
 {
@@ -9,10 +10,9 @@ namespace Gecko
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	public sealed class InstanceWrapper<T>
-		:IDisposable,IEquatable<InstanceWrapper<T>>
+		: ComPtr<T>
 		where T : class
 	{
-		private T _instance;
 
 		#region ctor & dror
 		/// <summary>
@@ -21,8 +21,8 @@ namespace Gecko
 		/// </summary>
 		/// <param name="contractID"></param>
 		public InstanceWrapper(string contractID)
+			:base(Xpcom.CreateInstance<T>(contractID))
 		{
-			_instance = Xpcom.CreateInstance<T>(contractID);
 		}
 
 		public T Instance
@@ -36,7 +36,8 @@ namespace Gecko
 		/// After disposing of InstanceWrapper refcount of <paramref name="obj"/> is decremented by 1
 		/// </summary>
 		/// <param name="obj">Xulrunner object(interface)</param>		
-		internal InstanceWrapper(T obj) : this(obj, false)
+		internal InstanceWrapper(T obj)
+			: this(obj, false)
 		{
 			
 		}
@@ -50,49 +51,9 @@ namespace Gecko
 		/// <param name="obj">Xulrunner object(interface)</param>
 		/// <param name="incrementReferenceCounter">true to perform QueryInterface on object</param>
 		internal InstanceWrapper(T obj,bool incrementReferenceCounter)
+			:base(incrementReferenceCounter ? Xpcom.QueryInterface<T>(obj) : obj)
 		{
-			_instance = incrementReferenceCounter ? Xpcom.QueryInterface<T>(obj) : obj;
-		}
-
-		~InstanceWrapper()
-		{
-			Xpcom.FreeComObject(ref _instance);
-		}
-
-		public void Dispose()
-		{
-			Xpcom.FreeComObject(ref _instance);
-			GC.SuppressFinalize(this);
 		}
 		#endregion
-
-		/// <summary>
-		/// Finaly releases Xulrunner COM object
-		/// Decrepment COM reference counter into zero
-		/// </summary>
-		public void FinalRelease()
-		{
-			Xpcom.FinalFreeComObject(ref _instance);
-		}
-
-		public bool Equals(InstanceWrapper<T> other)
-		{
-			if (ReferenceEquals(this, other)) return true;
-			if (ReferenceEquals(null, other)) return false;
-			return _instance.GetHashCode() == other._instance.GetHashCode();
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(this, obj)) return true;
-			if (ReferenceEquals(null, obj)) return false;
-			if (!(obj is InstanceWrapper<T>)) return false;
-			return _instance.GetHashCode() == ((InstanceWrapper<T>)obj)._instance.GetHashCode();
-		}
-
-		public override int GetHashCode()
-		{
-			return _instance != null ? _instance.GetHashCode() : 0;
-		}
 	}
 }

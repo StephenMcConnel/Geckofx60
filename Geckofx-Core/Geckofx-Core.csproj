@@ -87,6 +87,7 @@
     <Compile Include="DOM\Events\DomMouseEventArgs.cs" />
     <Compile Include="DOM\Events\DomUIEventArgs.cs" />
     <Compile Include="GeckoError.cs" />
+    <Compile Include="Interop\ComPtr.cs" />
     <Compile Include="Interop\ExtensionMethods.cs" />
     <Compile Include="Interop\nsWeakReference.cs" />
     <Compile Include="Net\AsyncStreamCopier.cs" />
