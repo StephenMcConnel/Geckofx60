@@ -79,6 +79,7 @@ namespace Gecko
 		#region  contracts for elements that NOT HAVE wrappers
 
 		public static readonly string NavHistoryService = "@mozilla.org/browser/nav-history-service;1";
+		public static readonly string XPathEvaluator = "@mozilla.org/dom/xpath-evaluator;1";
 
 		#endregion
 

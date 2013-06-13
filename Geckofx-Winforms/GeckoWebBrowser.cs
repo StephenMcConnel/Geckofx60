@@ -44,6 +44,7 @@ using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 using System.Text;
+using Gecko.Events;
 using Gecko.Interop;
 using Gecko.Net;
 
@@ -58,6 +59,7 @@ namespace Gecko
 		nsIContextMenuListener2,
 		nsIWebProgressListener,
 		nsIWebProgressListener2,
+		//nsIWebBrowserChromeFocus, -- TODO
 		nsIInterfaceRequestor,
 		nsIEmbeddingSiteWindow,
 		nsIDOMEventListener,
@@ -177,12 +179,8 @@ namespace Gecko
 			{
 				baseWindow.Destroy();
 				Marshal.ReleaseComObject(baseWindow);
-			}			
-			if (CommandParams != null)
-			{
-				Marshal.ReleaseComObject(CommandParams);
-				CommandParams = null;
-			}			
+			}
+			Xpcom.FreeComObject( ref CommandParams );		
 		}
 
 		#endregion
@@ -937,27 +935,18 @@ namespace Gecko
 			{
 				if (WebBrowser == null)
 					return null;
-
-				if (_Document == null || _Document.DomObject != WebBrowser.GetContentDOMWindowAttribute().GetDocumentAttribute())
-				{
-					_Document =
-						GeckoDomDocument.CreateDomDocumentWraper( WebBrowser.GetContentDOMWindowAttribute().GetDocumentAttribute() );
-					//FromDOMDocumentTable.Add((nsIDOMDocument)_Document.DomObject, this);
-				}
-				return _Document;
+				// caching document is bad idea in some situations when ajax is used
+				// dom document wrapper is 1 per page, so it is better to create it when it needed
+				return GeckoDomDocument.CreateDomDocumentWraper( WebBrowser.GetContentDOMWindowAttribute().GetDocumentAttribute() );
 			}
 		}
-		GeckoDomDocument _Document;
+		//GeckoDomDocument _Document;
 
 		public GeckoDocument Document
 		{
 			get { return DomDocument as GeckoDocument; }
 		}
 		
-		private void UnloadDocument()
-		{
-			_Document = null;
-		}
 		
 		public void SetInputFocus()
 		{
@@ -1482,13 +1471,22 @@ namespace Gecko
 
 			// Ignore ViewSource requests, they don't provide the URL
 			// see: http://mxr.mozilla.org/mozilla-central/source/netwerk/protocol/viewsource/nsViewSourceChannel.cpp#114
-			if (Xpcom.QueryInterface<nsIViewSourceChannel>(aRequest) != null)
-				return;
+			{
+				var viewSource = Xpcom.QueryInterface<nsIViewSourceChannel>( aRequest );
+				if ( viewSource != null )
+				{
+					Marshal.ReleaseComObject( viewSource );
+					return;
+				}
+			}
+	
 			#endregion validity checks
 
+			var request=Gecko.Net.Request.Create( aRequest );
+			
 			#region request parameters
 			Uri destUri = null;
-			Uri.TryCreate(nsString.Get(aRequest.GetNameAttribute), UriKind.Absolute, out destUri);
+			Uri.TryCreate( request.Name, UriKind.Absolute, out destUri );
 			var domWindow = aWebProgress.GetDOMWindowAttribute().Wrap( GeckoWindow.Create );
 
 			/* This flag indicates that the state transition is for a request, which includes but is not limited to document requests.
@@ -1549,7 +1547,7 @@ namespace Gecko
 						IsBusy = false;
 
 						// kill any cached document and raise DocumentCompleted event
-						UnloadDocument();
+
 						OnDocumentCompleted(EventArgs.Empty);
 
 						// clear progress bar
@@ -1624,7 +1622,6 @@ namespace Gecko
 					IsBusy = false;
 
 					// kill any cached document and raise DocumentCompleted event
-					UnloadDocument();
 					OnDocumentCompleted(EventArgs.Empty);
 
 					// clear progress bar
@@ -1645,6 +1642,8 @@ namespace Gecko
 		void nsIWebProgressListener.OnProgressChange(nsIWebProgress aWebProgress, nsIRequest aRequest, int aCurSelfProgress, int aMaxSelfProgress, int aCurTotalProgress, int aMaxTotalProgress)
 		{
 			// Note: If any progress value is unknown, then its value is replaced with -1.
+			var request = Gecko.Net.Request.Create( aRequest );
+
 
 			if ((aCurSelfProgress != -1) && (aMaxSelfProgress != -1))
 				OnRequestProgressChanged(new GeckoRequestProgressEventArgs(aCurTotalProgress, aMaxTotalProgress, aRequest));
@@ -2188,7 +2187,7 @@ namespace Gecko
 		public nsIWeakReference GetWeakReference()
 		{
 			return new ControlWeakReference( this );
-		}		
+		}
 	}
 	
 	#region public enum GeckoSecurityState
