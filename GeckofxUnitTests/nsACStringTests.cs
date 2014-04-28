@@ -67,5 +67,13 @@ namespace GeckofxUnitTests
 			var objectUnderTest = new nsACString("Hello world");
 			Assert.AreEqual("Hello world", objectUnderTest.ToString());
 		}
+
+		[Test]
+		public void ConstructorWithString_UnicodeValueLargerThanWillFitInSingleByte_ToStringReturnsExpectedTestValue()
+		{			
+			string testValue = "Hello 中文 world";
+			var objectUnderTest = new nsACString(testValue);
+			Assert.AreEqual(testValue, objectUnderTest.ToString());
+		}
 	}
 }

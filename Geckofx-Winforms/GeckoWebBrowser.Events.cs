@@ -21,6 +21,7 @@ namespace Gecko
 		// Navigation
 		private static readonly object NavigatingEvent = new object();
 		private static readonly object NavigatedEvent = new object();
+		private static readonly object NavigationErrorEvent = new object();
 		private static readonly object FrameNavigatingEvent = new object();
 		private static readonly object DocumentCompletedEvent = new object();
 		private static readonly object RedirectingEvent = new object();
@@ -131,6 +132,29 @@ namespace Gecko
 
 		#endregion
 
+		#region public event EventHandler<GeckoNavigationErrorEventArgs> NavigationError
+
+		/// <summary>
+		/// Occurs when navigation to a new page has failed or has been aborted by user.
+		/// </summary>
+		[Category( "Navigation" )]
+		[Description( "Occurs when navigation to a new page has failed or has been aborted by user." )]
+		public event EventHandler<GeckoNavigationErrorEventArgs> NavigationError
+		{
+			add { Events.AddHandler( NavigationErrorEvent, value ); }
+			remove { Events.RemoveHandler( NavigationErrorEvent, value ); }
+		}
+
+		/// <summary>Raises the <see cref="NavigationError"/> event.</summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnNavigationError( GeckoNavigationErrorEventArgs e )
+		{
+			var evnt = ( ( EventHandler<GeckoNavigationErrorEventArgs> ) Events[ NavigationErrorEvent ] );
+			if ( evnt != null ) evnt( this, e );
+		}
+
+		#endregion
+
 		#region public event EventHandler<GeckoRedirectingEventArgs> Redirecting
 
 		/// <summary>
@@ -185,14 +209,14 @@ namespace Gecko
 		#endregion
 
 
-		#region public event EventHandler DocumentCompleted
+		#region public event EventHandler DocumentCompleted<GeckoDocumentCompletedEventArgs>
 
 		/// <summary>
 		/// Occurs after the browser has finished parsing a new page and updated the <see cref="Document"/> property.
 		/// </summary>
 		[Category( "Navigation" )]
 		[Description( "Occurs after the browser has finished parsing a new page and updated the Document property." )]
-		public event EventHandler DocumentCompleted
+		public event EventHandler<GeckoDocumentCompletedEventArgs> DocumentCompleted
 		{
 			add { Events.AddHandler( DocumentCompletedEvent, value ); }
 			remove { Events.RemoveHandler( DocumentCompletedEvent, value ); }
@@ -200,9 +224,9 @@ namespace Gecko
 
 		/// <summary>Raises the <see cref="DocumentCompleted"/> event.</summary>
 		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDocumentCompleted( EventArgs e )
+		protected virtual void OnDocumentCompleted(GeckoDocumentCompletedEventArgs e)
 		{
-			var evnt = ( EventHandler ) Events[ DocumentCompletedEvent ];
+			var evnt = (EventHandler<GeckoDocumentCompletedEventArgs>)Events[DocumentCompletedEvent];
 			if ( evnt != null ) evnt( this, e );
 		}
 
@@ -1126,10 +1150,10 @@ namespace Gecko
 
 			//using (var a = new AutoJSContext(JSContext))
 			{
-				using (var jsd = new ServiceWrapper<jsdIDebuggerService>( "@mozilla.org/js/jsd/debugger-service;1" ))
+				using (var jsd = Xpcom.GetService2<jsdIDebuggerService>(Contracts.DebuggerService))
 				{
 					jsd.Instance.SetErrorHookAttribute( new JSErrorHandler( this ) );
-					using (var runtime = new ServiceWrapper<nsIJSRuntimeService>( "@mozilla.org/js/xpc/RuntimeService;1" ))
+					using (var runtime = Xpcom.GetService2<nsIJSRuntimeService>(Contracts.RuntimeService))
 					{
 						jsd.Instance.ActivateDebugger( runtime.Instance.GetRuntimeAttribute() );
 					}
@@ -1182,7 +1206,7 @@ namespace Gecko
 
 		public void EnableConsoleMessageNotfication()
 		{
-			using (var consoleService = new ServiceWrapper<nsIConsoleService>(Contracts.ConsoleService)) 
+			using (var consoleService = Xpcom.GetService2<nsIConsoleService>(Contracts.ConsoleService)) 
 			{
 				consoleService.Instance.RegisterListener(new ConsoleListener(this));
 			}			
