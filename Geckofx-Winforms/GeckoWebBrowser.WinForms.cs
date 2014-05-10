@@ -98,7 +98,7 @@ namespace Gecko
 				yield return "drag";
 				yield return "drop";
 				yield return "dragend";
-
+				yield return "mozfullscreenchange"; //TODO: change to "fullscreenchange" after prefix removed
 			}
 		}
 
@@ -437,6 +437,55 @@ namespace Gecko
                 e.Graphics.DrawImage(image, 0.0f, 0.0f);
             }
         }
+
+		/// <summary>
+		/// Enable default fullscreen windowing for HTML5 fullscreen.
+		/// 
+		/// You also have to set pref "full-screen-api.enabled" to true to enable fullscreen of gecko.
+		/// 
+		/// When the page enters fullscreen state, move this browser into a fullscreen Form;
+		/// When the page exits fullscreen state, move this browser back into its original parent, with original index.
+		/// 
+		/// This method should only be called AFTER this browser has been added into its parent.
+		/// After calling this method, this browser's Dock and index should not be changed anymore.
+		/// 
+		/// If this method is not called, the fullscreen element only fills the viewport of this browser.
+		/// 
+		/// You can also implement your fullscreen windowing by listening to the FullscreenChange event.
+		/// 
+		/// TODO: implement confirm prompt. Currently enters fullscreen without user's confirm.
+		/// </summary>
+		public void EnableDefaultFullscreen()
+		{
+			Control browserParent = Parent;
+			int browserIndex = Parent.Controls.IndexOf(this);
+			var browserDock = Dock;
+			Form fullscreenWindow = null;
+			FullscreenChange += (s, e) =>
+			{
+				if (Document.MozFullScreen && fullscreenWindow == null)
+				{
+					fullscreenWindow = new Form();
+					Dock = DockStyle.Fill;
+					fullscreenWindow.Controls.Add(this);
+					fullscreenWindow.WindowState = FormWindowState.Maximized;
+					fullscreenWindow.TopMost = true;
+					fullscreenWindow.FormBorderStyle = FormBorderStyle.None;
+					fullscreenWindow.Show();
+					fullscreenWindow.FormClosing += (sn, ev) =>
+					{
+						Dock = browserDock;
+						browserParent.Controls.Add(this);
+						browserParent.Controls.SetChildIndex(this, browserIndex);
+					};
+				}
+				else if (!this.Document.MozFullScreen && fullscreenWindow != null)
+				{
+					fullscreenWindow.Close();
+					fullscreenWindow = null;
+				}
+			};
+		}
 
 		#endregion
 

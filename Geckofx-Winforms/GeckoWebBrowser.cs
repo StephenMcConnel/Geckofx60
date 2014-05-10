@@ -1899,6 +1899,9 @@ namespace Gecko
 				case "dragend":
 					OnDomDragEnd((DomDragEventArgs)e);
 					break;
+				case "mozfullscreenchange": //TODO: change to "fullscreenchange" after prefix removed
+					OnFullscreenChange(e);
+					break;
 			}
 			if (e is DomMessageEventArgs)
 			{
