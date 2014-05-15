@@ -1458,11 +1458,6 @@ namespace Gecko
 			DocumentTitle = aTitle;
 		}
 
-		IntPtr nsIEmbeddingSiteWindow.GetSiteWindowAttribute()
-		{
-			return Handle;
-		}
-
 		void nsIEmbeddingSiteWindow.Blur()
 		{
 			// TODO: implement.
