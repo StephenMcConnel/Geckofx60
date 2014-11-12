@@ -336,8 +336,6 @@ namespace Gecko
 			{
 				_comGC = new COMGC();
 			}
-			
-			
 
 			// RegisterProvider is necessary to get link styles etc.
 			nsIDirectoryService directoryService = GetService<nsIDirectoryService>("@mozilla.org/file/directory_service;1");
@@ -352,6 +350,7 @@ namespace Gecko
             if (!Xpcom.IsLinux)
                 InitChromeContext();
 
+			XULAppInfoFactory.Init();
 			PromptFactoryFactory.Init();
 
 			if (AfterInitalization != null)
