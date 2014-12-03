@@ -282,7 +282,7 @@ namespace Gecko
 		{
 			if ( BaseWindow != null )
 			{
-				BaseWindow.SetPositionAndSize( 0, 0, ClientSize.Width, ClientSize.Height, true );
+				BaseWindow.SetPositionAndSize( 0, 0, ClientSize.Width != 0 ? ClientSize.Width : 1, ClientSize.Height != 0 ? ClientSize.Height : 1, true );
 			}
 
 			base.OnSizeChanged( e );
@@ -335,7 +335,7 @@ namespace Gecko
 							//	var str = string.Format( "-WM_MOUSEACTIVATE {0:X8} lastfocus", focus.ToInt32() );
 							//	System.Diagnostics.Debug.WriteLine( str );
 							}
-							if ( !this.Window.Equals(Services.WindowWatcher.ActiveWindow) )
+							if (Window != null && !Window.Equals(Services.WindowWatcher.ActiveWindow) )
 							{
 								if (WebBrowserFocus != null)
 									WebBrowserFocus.Activate();
