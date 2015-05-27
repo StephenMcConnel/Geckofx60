@@ -148,12 +148,12 @@ namespace Gecko
 	    public JsVal EvaluateScript(string javascript, nsIDOMWindow window)
 	    {
             string msg = String.Empty;
-            var old = SpiderMonkey.JS_SetErrorReporter(_cx, (cx, message, report) => { msg = message; });
-            try
+            IntPtr globalObject = ConvertCOMObjectToJSObject((nsISupports)window);
+            
+            using (new JSAutoCompartment(_cx, globalObject))
             {
-                IntPtr globalObject = ConvertCOMObjectToJSObject((nsISupports)window);
-
-                using (new JSAutoCompartment(_cx, globalObject))
+                var old = SpiderMonkey.JS_SetErrorReporter(_cx, (cx, message, report) => { msg = message; });
+                try
                 {
                     var windowJsVal = new JsVal();
                     string jsScript = "this";
@@ -173,10 +173,10 @@ namespace Gecko
                         return GetComponentsObject().GetUtilsAttribute().EvalInWindow(b, ref windowJsVal, _cx);
                     }
                 }
-            }
-            finally
-            {
-                SpiderMonkey.JS_SetErrorReporter(_cx, old);
+                finally
+                {
+                    SpiderMonkey.JS_SetErrorReporter(_cx, old);
+                }
             }
 	    }
 
