@@ -2,6 +2,10 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.38 ==
+1. Memory fixes
+Fixes both crashes and slow doesn't in apps that do a lot of navigations in a single browser instance.
+
 == v60.0-0.37 ==
 1. Fix GetProperty<double> type conversion bug.
 
