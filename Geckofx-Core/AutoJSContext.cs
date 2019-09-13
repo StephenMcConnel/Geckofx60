@@ -58,6 +58,7 @@ namespace Gecko
 
         private readonly IntPtr _cx;
         private readonly nsISupports _window;
+        private readonly IntPtr _windowPtrNonRefCounted;
         private JSAutoCompartment _defaultCompartment;
         private nsIXPCComponents _nsIXPCComponents;
         private IntPtr _globalJSObject;
@@ -68,6 +69,13 @@ namespace Gecko
         private static Dictionary<IntPtr, IntPtr> _contextToGlobalDictionary = new Dictionary<IntPtr, IntPtr>();
 
         private static IntPtr _safeContext;
+
+        /// <summary>
+        /// Store all the COM objects, that we have addrefed, before using WrapNative to create JSObjects wrappers.
+        /// We keep track of this on a per window basis, using the IUnknown values for the window, as the dictionary key.
+        /// The List contains the IUnknown for each object that we have wrapped with a JSOBject, for a given window.
+        /// </summary>
+        private static Dictionary<IntPtr, List<IntPtr>> _wrappedComObjectsReferences = new Dictionary<IntPtr, List<IntPtr>>();
 
         #endregion
 
@@ -131,6 +139,10 @@ namespace Gecko
                 _defaultCompartment = new JSAutoCompartment(SafeJSContext, _globalJSObject);
                 _cx = context;
                 _window = (nsISupports)window;
+                // Store the non refcounted IUnknown Ptr. 
+                // We use this as a unique key to the COM object, rather than as a ptr.
+                _windowPtrNonRefCounted  = Marshal.GetIUnknownForObject(_window);
+                Marshal.Release(_windowPtrNonRefCounted);
             }
 
             _contextStack.Push(this);
@@ -371,23 +383,73 @@ namespace Gecko
             }
         }
 
-        internal JSObjectWrapper ConvertCOMObjectToJSObject(nsISupports obj, bool holdRef=true)
+        /// <summary>
+        /// The first time we convert a COMObject instance to a JSObject, we need to addref it.
+        /// When the browser is destoryed or the page is reloaded then we need to release all these references
+        /// to prevent memory leaks. (Cycle collect quickly gets very slow)
+        /// </summary>
+        public void ReleaseWrapedNativeReferences()
+        {
+            var list = GetWrappedComObjectsList();
+            if (list == null)
+                return;
+            
+            var copies = list.ToArray();
+            list.Clear();
+            foreach (var c in copies)
+                Marshal.Release(c);
+        }
+
+        /// <summary>
+        /// Returns the current list of wrapped COM objects for this JS context current window.
+        /// </summary>
+        /// <returns>The lost or null if one doesn't exist.</returns>
+        private List<IntPtr> GetWrappedComObjectsList()
+        {
+            if (_windowPtrNonRefCounted == IntPtr.Zero || !_wrappedComObjectsReferences.ContainsKey(_windowPtrNonRefCounted))
+                return null;
+
+            return _wrappedComObjectsReferences[_windowPtrNonRefCounted];
+        }
+
+        private void EnsureWrappedComObjectListExistsForThisWindow()
+        {
+            if (!_wrappedComObjectsReferences.ContainsKey(_windowPtrNonRefCounted))
+                _wrappedComObjectsReferences[_windowPtrNonRefCounted] = new List<IntPtr>();
+        }
+
+        internal JSObjectWrapper ConvertCOMObjectToJSObject(nsISupports obj)
         {
             Guid guid = typeof (nsISupports).GUID;
 
             IntPtr globalObject = GetGlobalFromContext(ContextPointer);
-            if (obj is nsIXPConnectWrappedJS)            
+            if (obj is nsIXPConnectWrappedJS)
                 throw new GeckoException("Can't call WrapNative on Wrapped JSObject.");
 
-            // In geckofx 45 the WrapNative no longer returns a 'holder'
-
             // Calling GetIUnknownForObject for the addref.
-            if (holdRef)
-                Marshal.GetIUnknownForObject(obj);
+            IntPtr ptr = IntPtr.Zero;
+            ptr = Marshal.GetIUnknownForObject(obj);
+            EnsureWrappedComObjectListExistsForThisWindow();
+            var list = GetWrappedComObjectsList();
+            if (list.Contains(ptr))
+                Marshal.Release(ptr);
+            else
+                list.Add(ptr);
+
+            Marshal.AddRef(ptr);
+
+
+            var jsObject = Xpcom.XPConnect.Instance.WrapNative(ContextPointer, globalObject, obj, ref guid);
+
+            if (ptr != IntPtr.Zero)
+                Marshal.AddRef(ptr);
+
             var ret = new JSObjectWrapper(Marshal.GetIUnknownForObject(obj))
             {
-                JSObject = Xpcom.XPConnect.Instance.WrapNative(ContextPointer, globalObject, obj, ref guid)
+                JSObject = jsObject
             };
+
+            var js = ret.JSObject;
 
             return ret;
         }

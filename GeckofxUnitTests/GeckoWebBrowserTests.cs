@@ -17,6 +17,7 @@ namespace GeckofxUnitTests
     internal class GeckoWebBrowserTests
     {
         private GeckoWebBrowser _browser;
+        private Form _form;
 
         [SetUp]
         public void BeforeEachTestSetup()
@@ -24,12 +25,12 @@ namespace GeckofxUnitTests
             Xpcom.Initialize(XpComTests.XulRunnerLocation);
             //affecting browser.Realod()/GoForward()/GoBackward() of error page
             GeckoPreferences.User["browser.xul.error_pages.enabled"] = true;
-            var f = new Form();
+            _form = new Form();
             
             _browser = new GeckoWebBrowser();
             _browser.Dock = DockStyle.Fill;
-            f.Controls.Add(_browser);
-            f.Show();
+            _form.Controls.Add(_browser);
+            _form.Show();
         }
 
         [TearDown]
@@ -585,6 +586,15 @@ namespace GeckofxUnitTests
                 }
             }
         }
+        
+        [Test]
+        public void LoadHtml_Run500TimesNavigatingToANewDocumentEachTime_DoesNotCrash()
+        {
+            for (int i = 0; i < 500; i++)
+            {
+                _browser.TestLoadHtml(String.Format("{0}", i));              
+            }
+        }
 
         [Test]
         public void EvaluateScript_ReturingJsVal_ScriptExecutesAndReturnsJsValOfExpectedTypeAndContainingExpectedResult()
@@ -959,6 +969,134 @@ setTimeout(function(){
 		    }
 		}
 
+        [Test]
+        public void CycleCollectorLeakingTest_NavigateShouldNotHoldOnToPreviousObjects()
+        {
+            bool done = false;
+            _browser.DocumentCompleted += (sender, args) => done = true;
 
-	}
+            MemoryService.MinimizeHeap(true);
+
+            for (int i = 0; i < 40; i++)
+            {
+                done = false;
+                _browser.Navigate(@"file://e:\test.html");
+                while (!done)
+                {
+                    Application.DoEvents();
+                    Application.RaiseIdle(EventArgs.Empty);
+                }
+
+                var doc = _browser.Document;
+                Console.WriteLine(doc);
+                var v = doc.Doc.Value;
+                Console.WriteLine(v.GetProperty<string>("characterSet"));
+                Console.WriteLine(_browser.Document.Body);
+                Console.WriteLine(_browser.Document.Body.FirstChild);
+
+                DateTime b = DateTime.Now;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                MemoryService.MinimizeHeap(true);
+                DateTime a = DateTime.Now;
+                Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
+            }
+        }
+
+        [Test]
+        public void CycleCollectorLeakingTest_LoadContentShouldNotHoldOntoPreviousContent()
+        {
+            bool done = false;
+            _browser.DocumentCompleted += (sender, args) => done = true;
+
+            MemoryService.MinimizeHeap(true);
+
+            try
+            {
+                for (int i = 0; i < 40; i++)
+                {
+                    done = false;
+                    _browser.LoadContent(File.ReadAllText(@"e:\test.html"), "file://e:\test.html", "text/html");
+                    while (!done)
+                    {
+                        Application.DoEvents();
+                        Application.RaiseIdle(EventArgs.Empty);
+                    }
+                    var doc = _browser.Document;
+
+                    var v = doc.Doc.Value;
+                    Console.WriteLine(v.GetProperty<nsISupports>("body", true));
+                    Console.WriteLine(doc.Doc.Value.DocumentElement);
+
+                    DateTime b = DateTime.Now;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    MemoryService.MinimizeHeap(true);
+                    DateTime a = DateTime.Now;
+                    Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                    Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                Assert.Fail($"Exception: {ex}");
+            }
+        }
+
+        [Test]
+        public void CycleCollectorLeakingTest_TwoBrowsers_LoadContentShouldNotHoldOntoPreviousContent()
+        {
+
+            var browser2 = new GeckoWebBrowser();
+            browser2.Dock = DockStyle.Fill;
+            _form.Controls.Add(browser2);
+            _form.Show();
+
+
+            MemoryService.MinimizeHeap(true);
+
+            PerformTest(_browser, browser2);
+
+            browser2.Dispose();
+        }
+
+        private void PerformTest(GeckoWebBrowser first, GeckoWebBrowser second)
+        {
+            bool done = false;
+            first.DocumentCompleted += (sender, args) => done = true;
+            second.DocumentCompleted += (sender, args) => done = true;
+            try
+            {
+                for (int i = 0; i < 40; i++)
+                {
+                    var aBrowser = i % 2 == 0 ? first : second;
+                    done = false;
+                    aBrowser.LoadContent(File.ReadAllText(@"e:\test.html"), "file://e:\test.html", "text/html");
+                    while (!done)
+                    {
+                        Application.DoEvents();
+                        Application.RaiseIdle(EventArgs.Empty);
+                    }
+                    var doc = aBrowser.Document;
+
+                    var v = doc.Doc.Value;
+                    Console.WriteLine(v.GetProperty<nsISupports>("body", true));
+                    Console.WriteLine(doc.Doc.Value.DocumentElement);
+
+                    DateTime b = DateTime.Now;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    MemoryService.MinimizeHeap(true);
+                    DateTime a = DateTime.Now;
+                    Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                    Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                Assert.Fail($"Exception: {ex}");
+            }
+        }
+    }
 }

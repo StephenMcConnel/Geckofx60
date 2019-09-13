@@ -54,7 +54,7 @@ namespace Gecko.WebIDL
         public T GetProperty<T>(string propertyName, bool checkIfExists)
         {
             using (var context = new AutoJSContext(_globalWindowProxy))
-            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject, true))
+            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject))
             {
                 if (checkIfExists)
                     if (!SpiderMonkey.JS_HasProperty(context.ContextPointer, jsObject.JSObject, propertyName))
@@ -72,7 +72,7 @@ namespace Gecko.WebIDL
         public void SetProperty(string propertyName, object value)
         {
             using (var context = new AutoJSContext(_globalWindowProxy))
-            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject, true))
+            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject))
             {
                 DisposablCollection disposablCollection;
                 var types = ConvertTypes(new[] { value }, context, out disposablCollection).First();
@@ -95,7 +95,7 @@ namespace Gecko.WebIDL
         public void CallVoidMethod(string methodName, params object[] paramObjects)
         {
             using (var context = new AutoJSContext(_globalWindowProxy))
-            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject, true))
+            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject))
             {
                 DisposablCollection disposablCollection;
                 var collection = ConvertTypes(paramObjects, context, out disposablCollection);
@@ -107,7 +107,7 @@ namespace Gecko.WebIDL
         public T CallMethod<T>(string methodName, params object[] paramObjects)
         {
             using (var context = new AutoJSContext(_globalWindowProxy))
-            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject, true))
+            using (var jsObject = context.ConvertCOMObjectToJSObject(_thisObject))
             {
                 DisposablCollection disposablCollection;
                 var collection = ConvertTypes(paramObjects, context, out disposablCollection);
@@ -170,7 +170,7 @@ namespace Gecko.WebIDL
                     // This returns a  [xpconnect wrapped nsISupports] - why may or may not be good enought - if not could try and access the objects wrappedJSObject property?
                     // val = SpiderMonkey.JS_CallFunctionName(context.ContextPointer, jsObject, "valueOf");
                     // Replaced CallFunctionName 'valueOf' method with 'managed convert' (for speed reasons)
-                    var jso = context.ConvertCOMObjectToJSObject((nsISupports) p, false);
+                    var jso = context.ConvertCOMObjectToJSObject((nsISupports) p);
                     list.Add(jso);
                     val = JsVal.FromPtr(jso.JSObject);
                 }
@@ -197,7 +197,7 @@ namespace Gecko.WebIDL
                     else if (b.IsComObject())
                     {
                         var item = ((WebIDLUnionBase)p).ToComObject();
-                        var jso = context.ConvertCOMObjectToJSObject(item, false);
+                        var jso = context.ConvertCOMObjectToJSObject(item);
                         list.Add(jso);
                         val = JsVal.FromPtr(jso.JSObject);
                     }

@@ -171,6 +171,11 @@ namespace Gecko
 
                     BaseWindow.Create();
 
+                    // BaseWindow.Create creates the Top Level DOM window, but doesn't appear hold a strong reference to
+                    // prevent it being cleaned by the cycle collector / garbage collector.
+                    // So we add a ref our selfs.                    
+                    _toplLevelWindowIUnknown = Marshal.GetIUnknownForObject(Browser.GetContentDOMWindowAttribute());
+
                     var docShell = Xpcom.QueryInterface<nsIDocShell>(BaseWindow);
                     // Allow visible control before finished loading see https://bugzilla.mozilla.org/show_bug.cgi?id=1138536
                     docShell.CreateAboutBlankContentViewer(null); 
@@ -317,6 +322,10 @@ namespace Gecko
             {
                 this.Stop();
 
+                if (Window != null)
+                    using (var context = new AutoJSContext(Window))
+                        context.ReleaseWrapedNativeReferences();
+
                 WindowMediator.UnregisterWindow(this);
 
                 if (_weakRef != null)
@@ -359,6 +368,7 @@ namespace Gecko
                     EventTarget = null;
                 }
 
+                Marshal.Release(_toplLevelWindowIUnknown);
                 BaseWindow.Destroy();
 
                 Xpcom.FreeComObject(ref CommandParams);

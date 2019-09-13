@@ -133,6 +133,39 @@ llo")]
             Assert.AreEqual("Calling function 'functionThatThrows' failed: 'ReferenceError: someerror is not defined StackTrace: myfunc@script:1:52\n'", ex.Message);
         }
 
+        [Test]
+        public void CallMethod_WithReturnAndParam_ReturnsCOMObject()
+        {
+            _browser.TestLoadHtml("<div id='someid'>hi</div>");
+
+            var objectUnderTest = new WebIDLBase((mozIDOMWindowProxy) _browser.Window.DomWindow, (nsISupports)_browser.Window.Document.DomObject);
+
+            var result = objectUnderTest.CallMethod<nsISupports>("getElementById", "someid");
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void CallMethod_GCTest_DoesNotCrash()
+        {
+            //GeckoPreferences.User["javascript.options.mem.gc_compacting"] = false;
+
+            _browser.TestLoadHtml("<div contentEditable=true>It may look like I've hung, <div id='someid'> but  </div> I'm running a stress test</div>");
+
+            var memoryService = Xpcom.GetService<nsIMemory>("@mozilla.org/xpcom/memory-service;1");
+            var document = new WebIDLBase((mozIDOMWindowProxy)_browser.Window.DomWindow, (nsISupports)_browser.Window.Document.DomObject);
+
+            var result = document.CallMethod<nsISupports>("getElementById", "someid");
+            var objectUnderTest = new WebIDLBase((mozIDOMWindowProxy)_browser.Window.DomWindow, result);
+
+            var element = _browser.Document.GetHtmlElementById("someid");
+
+            for (int i = 0; i < 100; i++)
+            {                                
+                Application.DoEvents();
+                element.InnerHtml = $"{i}";
+            }
+        }
+
         #region TestData
 
         private readonly string _testData3 =

@@ -88,7 +88,7 @@ namespace GeckofxUnitTests
             Assert.Null(browser.Editor);
 
             using (var context = new AutoJSContext(browser.Window))
-            using (var jsObject = context.ConvertCOMObjectToJSObject((nsISupports)browser.Document.DomObject, false))
+            using (var jsObject = context.ConvertCOMObjectToJSObject((nsISupports)browser.Document.DomObject))
             {
                 var jsVal = JsVal.FromPtr(jsObject.JSObject);
 

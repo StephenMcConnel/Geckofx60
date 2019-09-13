@@ -109,6 +109,8 @@ namespace Gecko
         private GeckoWindow _Window;
         private GeckoDomDocument _Document;
 
+        private IntPtr _toplLevelWindowIUnknown;
+
         #endregion
 
         #region public static methods
@@ -397,6 +399,8 @@ namespace Gecko
                 referrerUri = IOService.CreateNsIUri(referrer);
             }
 
+            OnBeforeReloadingDocument();
+
             // We want Navigate() to return immediately and to fire events asynchronously. Howerver,
             // WebNav.LoadURI() may fire 'Navigating' event synchronously, so we call it asynchronously.
             // WebNav.LoadURI may throw exceptions for some inaccessable urls
@@ -456,10 +460,25 @@ namespace Gecko
             LoadContent(content, url, "text/html");
         }
 
+        private void OnBeforeReloadingDocument()
+        {
+            // Each reload causes us to lose a reference to the top level window.
+            // So prempt that by doing an AddRef here.
+            if (_toplLevelWindowIUnknown != IntPtr.Zero)
+                Marshal.AddRef(_toplLevelWindowIUnknown);
+
+            // Release all the JSObject wrappers we crated from the ComObjects.
+            if (Window != null)
+                using (var context = new AutoJSContext(Window))
+                    context.ReleaseWrapedNativeReferences();
+        }
+
         public void LoadContent(string content, string url, string contentType)
         {
             if (url == null)
                 throw new ArgumentNullException("url");
+
+            OnBeforeReloadingDocument();
 
             //// Control handle must be created so we can get a nsIDocShell.
             if (CouldFindOrCreateHandle())

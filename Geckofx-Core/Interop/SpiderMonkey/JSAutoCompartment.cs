@@ -21,7 +21,7 @@ namespace Gecko
             if (context == null)
                 throw new ArgumentNullException("comObject");
 
-            _obj = context.ConvertCOMObjectToJSObject(comObject, false);
+            _obj = context.ConvertCOMObjectToJSObject(comObject);
             _cx = context.ContextPointer;
 
             EnterCompartment();
