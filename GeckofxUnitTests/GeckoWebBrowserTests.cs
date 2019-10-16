@@ -1098,5 +1098,28 @@ setTimeout(function(){
                 Assert.Fail($"Exception: {ex}");
             }
         }
+
+
+        [Explicit("Test shows modal dialog")]
+        [Test]
+        public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages()
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                _browser.Navigate($"http://pastebin.com/{Guid.NewGuid()}");
+
+                _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
+
+                // Without doing these 3 things - about:memory shows lots of pastebin pages. (and consumes lots of memory)
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                MemoryService.MinimizeHeap(true);
+            }
+
+            _browser.Navigate("about:memory");
+
+            _form.Visible = false;
+            _form.ShowDialog();
+        }
     }
 }
