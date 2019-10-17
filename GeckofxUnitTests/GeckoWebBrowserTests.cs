@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -1120,6 +1121,146 @@ setTimeout(function(){
 
             _form.Visible = false;
             _form.ShowDialog();
+        }
+
+        [Explicit("Test shows modal dialog")]
+        [Test]
+        public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages2()
+        {
+            var filesToDelete = new List<string>();
+            try
+            {
+                SetBloomPreferences();
+                _form.Size = new Size(600, 600);
+                for (int i = 0; i < 50; i++)
+                {
+                    var filename = CreateTestHtmlFile();
+                    _browser.Navigate($"file://{filename}");
+
+                    _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
+
+                    // Without doing these 3 things - about:memory shows lots of "active" pages. (which consume lots of memory)
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    MemoryService.MinimizeHeap(true);
+
+                    System.Threading.Thread.Sleep(500);
+                    filesToDelete.Add(filename);
+                }
+
+                var form2 = new Form();
+                var browser2 = new GeckoWebBrowser {Dock = DockStyle.Fill};
+                form2.Controls.Add(browser2);
+                browser2.Navigate("about:memory");
+                form2.ShowDialog();
+            }
+            finally
+            {
+                foreach (var path in filesToDelete)
+                    File.Delete(path);
+            }
+        }
+
+        private bool _browserDone;
+
+        [Explicit("Test shows modal dialog")]
+        [Test]
+        public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages3()
+        {
+            var filesToDelete = new List<string>();
+            try
+            {
+                SetBloomPreferences();
+                _form.Size = new Size(600, 600);
+                for (int i = 0; i < 50; i++)
+                {
+                    _browserDone = false;
+                    var filename = CreateTestHtmlFile();
+                    _browser.DocumentCompleted += WebBrowser_ReadyStateChanged;
+                    _browser.ReadyStateChange += WebBrowser_ReadyStateChanged;
+                    _browser.Navigate($"file://{filename}");
+
+                    while (!_browserDone)
+                    {
+                        Application.DoEvents();
+                        Application.RaiseIdle(EventArgs.Empty);
+                    }
+                    System.Threading.Thread.Sleep(500);
+                    filesToDelete.Add(filename);
+                }
+
+                var form2 = new Form();
+                var browser2 = new GeckoWebBrowser {Dock = DockStyle.Fill};
+                form2.Controls.Add(browser2);
+                browser2.Navigate("about:memory");
+                form2.ShowDialog();
+            }
+            finally
+            {
+                foreach (var path in filesToDelete)
+                    File.Delete(path);
+            }
+        }
+
+        private static void SetBloomPreferences()
+        {
+            GeckoPreferences.User["network.proxy.http"] = string.Empty;
+            GeckoPreferences.User["network.proxy.http_port"] = 80;
+            GeckoPreferences.User["network.proxy.type"] =
+                1; // 0 = direct (uses system settings on Windows), 1 = manual configuration
+            GeckoPreferences.User["memory.free_dirty_pages"] = true;
+            // Do NOT set this to zero. Somehow that disables following hyperlinks within a document
+            GeckoPreferences.User["browser.sessionhistory.max_entries"] = 1;
+            GeckoPreferences.User["browser.sessionhistory.max_total_viewers"] = 0;
+            GeckoPreferences.User["browser.cache.memory.enable"] = false;
+            GeckoPreferences.User["image.mem.max_decoded_image_kb"] = 40960; // 40MB (default = 256000 == 250MB)
+            GeckoPreferences.User["javascript.options.mem.max"] = 40960; // 40MB (default = -1 == automatic)
+            GeckoPreferences.User["javascript.options.mem.high_water_mark"] = 20; // 20MB (default = 128 == 128MB)
+            GeckoPreferences.User["image.mem.surfacecache.max_size_kb"] = 40960; // 40MB
+            GeckoPreferences.User["image.mem.surfacecache.min_expiration_ms"] = 500; // 500ms (default = 60000 == 60sec)
+            GeckoPreferences.User["browser.cache.memory.capacity"] = 0; // 0 disables feature
+            GeckoPreferences.User["network.http.max-persistent-connections-per-server"] = 200;
+            GeckoPreferences.User["network.http.pipelining.maxrequests"] = 200;
+            GeckoPreferences.User["network.http.pipelining.max-optimistic-requests"] = 200;
+            GeckoPreferences.User["gfx.font_rendering.graphite.enabled"] = true;
+            GeckoPreferences.User["mousewheel.with_control.action"] = 0;
+            GeckoPreferences.User["media.navigator.enabled"] = true;
+            GeckoPreferences.User["media.navigator.permission.disabled"] = true;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                GeckoPreferences.User["layers.acceleration.force-enabled"] = true;
+            GeckoPreferences.User["browser.zoom.full"] = true;
+            GeckoPreferences.User["layout.spellcheckDefault"] = 0;
+        }
+
+        private string CreateTestHtmlFile()
+        {
+            var htmlFile = Guid.NewGuid() + ".html";
+            var htmlPath = Path.Combine(Path.GetTempPath(), htmlFile);
+            File.WriteAllText(htmlPath, @"<html>
+<head>
+<meta charset=""utf-8""></meta>
+</head>
+<body>
+<h1>This is a test!</h1>
+<p class=""greenText"">of course it is...</p>
+<p id=""demo"" class=""redText"">The file is " + htmlPath + @"</p>
+</body>
+</html>");
+            return htmlPath;
+        }
+
+        void WebBrowser_ReadyStateChanged(object sender, EventArgs e)
+        {
+            if (_browser.Document.ReadyState != "complete")
+                return; // Keep receiving until it is complete.
+            _browser.ReadyStateChange -= WebBrowser_ReadyStateChanged; // just do this once per navigation
+            _browser.DocumentCompleted -= WebBrowser_ReadyStateChanged;
+
+            // These don't seem to have any effect at all.
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            MemoryService.MinimizeHeap(true);
+            _browserDone = true;
         }
     }
 }
