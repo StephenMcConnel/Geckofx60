@@ -436,10 +436,7 @@ namespace Gecko
             else
                 list.Add(ptr);
 
-
-
             var jsObject = Xpcom.XPConnect.Instance.WrapNative(ContextPointer, globalObject, obj, ref guid);
-
 
             var ret = new JSObjectWrapper(Marshal.GetIUnknownForObject(obj))
             {
