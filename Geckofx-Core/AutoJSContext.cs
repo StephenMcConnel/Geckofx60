@@ -73,9 +73,9 @@ namespace Gecko
         /// <summary>
         /// Store all the COM objects, that we have addrefed, before using WrapNative to create JSObjects wrappers.
         /// We keep track of this on a per window basis, using the IUnknown values for the window, as the dictionary key.
-        /// The List contains the IUnknown for each object that we have wrapped with a JSOBject, for a given window.
+        /// The HashSet contains the IUnknown for each object that we have wrapped with a JSOBject, for a given window.
         /// </summary>
-        private static Dictionary<IntPtr, List<IntPtr>> _wrappedComObjectsReferences = new Dictionary<IntPtr, List<IntPtr>>();
+        private static Dictionary<IntPtr, HashSet<IntPtr>> _wrappedComObjectsReferences = new Dictionary<IntPtr, HashSet<IntPtr>>();
 
         #endregion
 
@@ -404,7 +404,7 @@ namespace Gecko
         /// Returns the current list of wrapped COM objects for this JS context current window.
         /// </summary>
         /// <returns>The lost or null if one doesn't exist.</returns>
-        private List<IntPtr> GetWrappedComObjectsList()
+        private HashSet<IntPtr> GetWrappedComObjectsList()
         {
             if (_windowPtrNonRefCounted == IntPtr.Zero || !_wrappedComObjectsReferences.ContainsKey(_windowPtrNonRefCounted))
                 return null;
@@ -415,7 +415,7 @@ namespace Gecko
         private void EnsureWrappedComObjectListExistsForThisWindow()
         {
             if (!_wrappedComObjectsReferences.ContainsKey(_windowPtrNonRefCounted))
-                _wrappedComObjectsReferences[_windowPtrNonRefCounted] = new List<IntPtr>();
+                _wrappedComObjectsReferences[_windowPtrNonRefCounted] = new HashSet<IntPtr>();
         }
 
         internal JSObjectWrapper ConvertCOMObjectToJSObject(nsISupports obj)
