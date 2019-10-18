@@ -1,6 +1,11 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+== v60.0-0.40 ==
+Linux build
+1. More memory fixes
+Fix cases in apps that do a lot of navigations in a single browser instance and access document properties via webidl, 
+hold onto old pages.
 
 == v60.0-0.39 ==
 Linux build
