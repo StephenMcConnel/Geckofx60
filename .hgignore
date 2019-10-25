@@ -30,3 +30,6 @@ Geckofx-Winforms/Firefox*/**
 .idea/
 Geckofx.VC.db
 Geckofx.VC.VC.opendb
+.vs/Geckofx/v14/**
+.vs/Geckofx/v15/**
+.vs/Geckofx/v16/**
