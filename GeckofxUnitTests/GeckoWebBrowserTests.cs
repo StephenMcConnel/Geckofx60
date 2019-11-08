@@ -1262,5 +1262,82 @@ setTimeout(function(){
             MemoryService.MinimizeHeap(true);
             _browserDone = true;
         }
+
+        [Explicit("Test shows modal dialog")]
+        [Test]
+        public void JavascriptBlobTest()
+        {
+            // Opening the HTML used in this test as a file in Firefox shows the
+            // iframe content being updated each time you click the button.  Running
+            // this unit test with Geckofx60 in C#, the iframe never gets updated.
+            // (In fact, the iframe stays empty from the beginning.)
+            string htmlFile = null;
+            try
+            {
+                _form.Close();
+                SetBloomPreferences();
+                htmlFile = CreateHtmlFileToTestBlobs();
+                var form2 = new Form { Size = new Size(600, 600) };
+                var browser2 = new GeckoWebBrowser { Dock = DockStyle.Fill };
+                form2.Controls.Add(browser2);
+                browser2.Navigate($"file://{htmlFile}");
+                form2.ShowDialog();
+            }
+            finally
+            {
+                if (!String.IsNullOrEmpty(htmlFile) && File.Exists(htmlFile))
+                    File.Delete(htmlFile);
+            }
+        }
+
+        private string CreateHtmlFileToTestBlobs()
+        {
+            var htmlFile = Guid.NewGuid() + ".html";
+            var htmlPath = Path.Combine(Path.GetTempPath(), htmlFile);
+            // Note that Firefox doesn't seem to recognize the initial srcdoc content,
+            // but does set it and see it properly in the onload handler attached to
+            // the body element.  Geckofx60 inside C# doesn't even do that much.
+            File.WriteAllText(htmlPath, @"<html>
+   <head>
+    <meta charset=""UTF-8""/>
+    <script type=""text/javascript"">
+//<![CDATA[
+count = 0;
+function loadIframe() {
+    var iframe = document.getElementById(""innerTest"");
+    var html = ""<html><head><meta charset='UTF-8'/></head><body>"" +
+        ""<p>The button has not yet been clicked.</p>"" +
+        ""</body></html>"";
+    iframe.setAttribute('srcdoc', html);
+}
+function clickButton() {
+    ++count;
+    var html = ""<html><head><meta charset='UTF-8'/></head><body>"" +
+        ""<p>The button has been clicked "" + count + "" times.</p>"" +
+        ""</body></html>"";
+    var blob = new Blob([html], {""type"": ""text/html""});
+    var uri = window.URL.createObjectURL(blob);
+    var iframe = document.getElementById(""innerTest"");
+    iframe.removeAttribute('srcdoc');
+    iframe.setAttribute('src', uri);
+}
+//]]>
+    </script>
+  </head>
+  <body onload=""loadIframe()"">
+    <div id=""test"" class=""text"">
+      <p>This is a test!</p>
+    </div>
+    <div class=""framing"">
+    <iframe id=""innerTest"" srcdoc=""<p>This is a test.</p>"">
+      Sorry, iframe doesn't work in this browser!
+    </iframe>
+    </div>
+    <br/>
+    <button type=""button"" onclick=""clickButton()"">Click Me!</button> 
+  </body>
+</html>");
+            return htmlPath;
+        }
     }
 }
