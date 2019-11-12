@@ -36,6 +36,10 @@ namespace Gecko
 
         public uint Read(IntPtr aBuf, uint aCount)
         {
+            
+            if (aBuf == IntPtr.Zero)
+                throw new NotImplementedException();
+
             uint count = Math.Min(aCount, Available());
 
             if (count > 0)
