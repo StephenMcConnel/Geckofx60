@@ -1,6 +1,9 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+== v60.0-0.43 ==
+1. Fixes JS blob support (and other url loading things)
+
 == v60.0-0.42 ==
 1. Fix performance regression, when doing a huge amount of document interaction.
 == v60.0-0.40 ==
