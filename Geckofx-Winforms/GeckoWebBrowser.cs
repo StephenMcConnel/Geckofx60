@@ -161,7 +161,10 @@ namespace Gecko
                 _topLevelWindow.Move(xpos, ypos);
                 _topLevelWindow.Visible = hidePopupWindow ? false : true;
                 if (!hidePopupWindow)
-                    _topLevelWindow.GdkWindow.Opacity = 0.0;
+                    _topLevelWindow.Window.Opacity = 0.0;
+
+                if (Environment.GetEnvironmentVariable("GECKOFX_FORCE_EARLY_SKIP_TASK_BAR") != null)                    
+                    _topLevelWindow.SkipTaskbarHint = true;
 
                 GtkDotNet.GtkWrapperNoThread.ProcessPendingGtkEvents();
 
