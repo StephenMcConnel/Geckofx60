@@ -8,9 +8,11 @@ using System.Windows.Forms;
 using Gecko;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Gecko.DOM;
 using Gecko.Events;
 using Gecko.JQuery;
+using GeckofxUnitTests.ExtensionMethods;
 
 namespace GeckofxUnitTests
 {
@@ -1261,6 +1263,56 @@ setTimeout(function(){
             GC.WaitForPendingFinalizers();
             MemoryService.MinimizeHeap(true);
             _browserDone = true;
+        }
+
+        [Explicit("Slow and connects to google")]
+        [Test]
+        public void EvaluateScript_OnParentLessBrowserIstanceAndApplicationDoEventsBeingCalled_DoesNotCrash()
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                var b = new GeckoWebBrowser();
+                var h = b.Handle;
+                b.Navigate("http://www.google.com");
+                //b.WaitUntilNavigatinFinished(); // This uses await Task.Delay and so doesn't crash/
+                b.NavigateFinishedNotifier.BlockUntilNavigationFinished(); // This uses Application.DoEvents() and so crashes as it seems to invoke Firefox Idle handler.. (IdleTaskRunner)
+                for (int j = 0; j < 100; j++)
+                {
+                    using (var context = new AutoJSContext(b.Window))
+                    {
+                        var result = context.EvaluateScript("getComputedStyle(document.body, null).display",
+                            (nsISupports) b.Window.DomWindow,
+                            (nsISupports) b.Document.DomObject);
+                        if (!result.IsString)
+                            Console.WriteLine("NotString");
+                    }
+
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                }
+                b.Dispose();
+            }
+        }
+
+        [Explicit("Slow and connects to google")]
+        [Test]
+        public void EvaluateScript_NavigateToPageThatDoesSamePageNavigations_DoesNotCrash()
+        {
+            for (int i = 0; i < 80; i++)
+            {
+                var b = new GeckoWebBrowser();
+                var h = b.Handle;
+                for (int j = 0; j < 5; j++)
+                {
+                    b.Navigate("http://www.google.com");
+                    b.NavigateFinishedNotifier
+                        .BlockUntilNavigationFinished(); // This uses Application.DoEvents() and so crashes as it seems to invoke Firefox Idle handler.. (IdleTaskRunner)
+                }
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                Console.WriteLine($"{i}");
+                b.Dispose();
+            }
         }
 
         [Explicit("Test shows modal dialog")]

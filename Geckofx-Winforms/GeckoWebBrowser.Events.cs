@@ -157,10 +157,13 @@ namespace Gecko
         /// <param name="e">The data for the event.</param>
         protected virtual void OnNavigated(GeckoNavigatedEventArgs e)
         {
-            DetachEvents(true);
-            AttachEvents();
+            if (!e.IsSameDocument)
+            {
+                DetachEvents(true);
+                AttachEvents();
 
-            ReattachMessageEventListerns();
+                ReattachMessageEventListerns();
+            }
 
             var evnt = (EventHandler<GeckoNavigatedEventArgs>) Events[NavigatedEvent];
             if (evnt != null) evnt(this, e);
