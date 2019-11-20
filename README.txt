@@ -1,6 +1,9 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+== v60.0-0.44 ==
+1. Fix crashes when viewing JS Readium epub viewer.
+
 == v60.0-0.43 ==
 1. Fixes JS blob support (and other url loading things)
 
