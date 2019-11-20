@@ -1315,6 +1315,28 @@ setTimeout(function(){
             }
         }
 
+        /// <summary>
+        /// Test Helper method to return the ref count of the ContentDOMWindow
+        /// </summary>
+        public static int GetContentDomWindowComRefCount(GeckoWebBrowser browser)
+        {
+            var domWindow = browser.Browser.GetContentDOMWindowAttribute();
+            var w = Marshal.GetIUnknownForObject(domWindow);
+            return Marshal.Release(w);
+        }
+
+        [Test]
+        public void AttachEvents_ContentDomRefCountIsNotDecremented()
+        {
+            _browser.Navigate(@"e:\test.html");
+            _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
+            var beforeRef = GetContentDomWindowComRefCount(_browser);
+            _browser.DetachEvents(true);
+            _browser.AttachEvents();
+            var afterRef = GetContentDomWindowComRefCount(_browser);
+            Assert.AreEqual(beforeRef, afterRef, "AttachEvents Should not decrement ContentDomWindow");
+        }
+
         [Explicit("Test shows modal dialog")]
         [Test]
         public void JavascriptBlobTest()

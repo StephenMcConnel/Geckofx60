@@ -229,13 +229,15 @@ namespace Gecko
         /// <summary>
         /// True if events have been attached to the 'Root' window.
         /// </summary>
-        private bool _eventsAttached;        
-        private void AttachEvents()
+        private bool _eventsAttached;
+        internal void AttachEvents()
         {
             if (_eventsAttached)
                 return;
 
             var domWindow = Browser.GetContentDOMWindowAttribute();
+            // The call to get GetPrivateRoot causes the COM refcound of the ContentDOmWindow to be decremented, so we add a ref to prevent that from happening.
+            Marshal.GetIUnknownForObject(domWindow);
             EventTarget = Xpcom.GetPrivateRoot((nsISupports) domWindow).AsComPtr();
             foreach (string sEventName in this.DefaultEvents)
             {
@@ -250,7 +252,7 @@ namespace Gecko
         /// Remove Default events listeners.
         /// </summary>
         /// <param name="lazy">if true doesn't actually remove the event (as expecting a pending AddEventListener which will override the existing event)</param>
-        private void DetachEvents(bool lazy = false)
+        internal void DetachEvents(bool lazy = false)
         {
             if (!_eventsAttached)
                 return;
