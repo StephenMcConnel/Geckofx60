@@ -983,27 +983,30 @@ setTimeout(function(){
             for (int i = 0; i < 40; i++)
             {
                 done = false;
-                _browser.Navigate(@"file://e:\test.html");
-                while (!done)
+                using (var testFile = new HtmlTestFile(@"<div>hello world</div>"))
                 {
-                    Application.DoEvents();
-                    Application.RaiseIdle(EventArgs.Empty);
+                    _browser.Navigate(testFile.FileName);
+                    while (!done)
+                    {
+                        Application.DoEvents();
+                        Application.RaiseIdle(EventArgs.Empty);
+                    }
+
+                    var doc = _browser.Document;
+                    Console.WriteLine(doc);
+                    var v = doc.Doc.Value;
+                    Console.WriteLine(v.GetProperty<string>("characterSet"));
+                    Console.WriteLine(_browser.Document.Body);
+                    Console.WriteLine(_browser.Document.Body.FirstChild);
+
+                    DateTime b = DateTime.Now;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    MemoryService.MinimizeHeap(true);
+                    DateTime a = DateTime.Now;
+                    Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                    Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
                 }
-
-                var doc = _browser.Document;
-                Console.WriteLine(doc);
-                var v = doc.Doc.Value;
-                Console.WriteLine(v.GetProperty<string>("characterSet"));
-                Console.WriteLine(_browser.Document.Body);
-                Console.WriteLine(_browser.Document.Body.FirstChild);
-
-                DateTime b = DateTime.Now;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                MemoryService.MinimizeHeap(true);
-                DateTime a = DateTime.Now;
-                Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
-                Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
             }
         }
 
@@ -1020,25 +1023,28 @@ setTimeout(function(){
                 for (int i = 0; i < 40; i++)
                 {
                     done = false;
-                    _browser.LoadContent(File.ReadAllText(@"e:\test.html"), "file://e:\test.html", "text/html");
-                    while (!done)
+                    using (var testFile = new HtmlTestFile(@"<div>hello world</div>"))
                     {
-                        Application.DoEvents();
-                        Application.RaiseIdle(EventArgs.Empty);
+                        _browser.LoadContent(File.ReadAllText(testFile.FileName), "file://" + testFile.FileName, "text/html");
+                        while (!done)
+                        {
+                            Application.DoEvents();
+                            Application.RaiseIdle(EventArgs.Empty);
+                        }
+                        var doc = _browser.Document;
+
+                        var v = doc.Doc.Value;
+                        Console.WriteLine(v.GetProperty<nsISupports>("body", true));
+                        Console.WriteLine(doc.Doc.Value.DocumentElement);
+
+                        DateTime b = DateTime.Now;
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        MemoryService.MinimizeHeap(true);
+                        DateTime a = DateTime.Now;
+                        Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                        Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
                     }
-                    var doc = _browser.Document;
-
-                    var v = doc.Doc.Value;
-                    Console.WriteLine(v.GetProperty<nsISupports>("body", true));
-                    Console.WriteLine(doc.Doc.Value.DocumentElement);
-
-                    DateTime b = DateTime.Now;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    MemoryService.MinimizeHeap(true);
-                    DateTime a = DateTime.Now;
-                    Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
-                    Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
                 }
             }
             catch (AccessViolationException ex)
@@ -1055,7 +1061,6 @@ setTimeout(function(){
             browser2.Dock = DockStyle.Fill;
             _form.Controls.Add(browser2);
             _form.Show();
-
 
             MemoryService.MinimizeHeap(true);
 
@@ -1075,25 +1080,29 @@ setTimeout(function(){
                 {
                     var aBrowser = i % 2 == 0 ? first : second;
                     done = false;
-                    aBrowser.LoadContent(File.ReadAllText(@"e:\test.html"), "file://e:\test.html", "text/html");
-                    while (!done)
+                    using (var testFile = new HtmlTestFile(@"<div>hello world</div>"))
                     {
-                        Application.DoEvents();
-                        Application.RaiseIdle(EventArgs.Empty);
+                        aBrowser.LoadContent(File.ReadAllText(testFile.FileName), "file://" + testFile.FileName,
+                            "text/html");
+                        while (!done)
+                        {
+                            Application.DoEvents();
+                            Application.RaiseIdle(EventArgs.Empty);
+                        }
+                        var doc = aBrowser.Document;
+
+                        var v = doc.Doc.Value;
+                        Console.WriteLine(v.GetProperty<nsISupports>("body", true));
+                        Console.WriteLine(doc.Doc.Value.DocumentElement);
+
+                        DateTime b = DateTime.Now;
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        MemoryService.MinimizeHeap(true);
+                        DateTime a = DateTime.Now;
+                        Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
+                        Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
                     }
-                    var doc = aBrowser.Document;
-
-                    var v = doc.Doc.Value;
-                    Console.WriteLine(v.GetProperty<nsISupports>("body", true));
-                    Console.WriteLine(doc.Doc.Value.DocumentElement);
-
-                    DateTime b = DateTime.Now;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    MemoryService.MinimizeHeap(true);
-                    DateTime a = DateTime.Now;
-                    Console.WriteLine($"mh took {((a - b).TotalMilliseconds)}ms");
-                    Assert.True((a - b) < TimeSpan.FromSeconds(1), "MinimizeHeap should be quick!");
                 }
             }
             catch (AccessViolationException ex)
@@ -1129,7 +1138,7 @@ setTimeout(function(){
         [Test]
         public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages2()
         {
-            var filesToDelete = new List<string>();
+            var filesToDelete = new List<HtmlTestFile>();
             try
             {
                 SetBloomPreferences();
@@ -1137,7 +1146,7 @@ setTimeout(function(){
                 for (int i = 0; i < 50; i++)
                 {
                     var filename = CreateTestHtmlFile();
-                    _browser.Navigate($"file://{filename}");
+                    _browser.Navigate($"file://{filename.FileName}");
 
                     _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
 
@@ -1158,8 +1167,8 @@ setTimeout(function(){
             }
             finally
             {
-                foreach (var path in filesToDelete)
-                    File.Delete(path);
+                foreach (var testFile in filesToDelete)
+                    testFile.Dispose();
             }
         }
 
@@ -1169,7 +1178,7 @@ setTimeout(function(){
         [Test]
         public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages3()
         {
-            var filesToDelete = new List<string>();
+            var filesToDelete = new List<HtmlTestFile>();
             try
             {
                 SetBloomPreferences();
@@ -1180,7 +1189,7 @@ setTimeout(function(){
                     var filename = CreateTestHtmlFile();
                     _browser.DocumentCompleted += WebBrowser_ReadyStateChanged;
                     _browser.ReadyStateChange += WebBrowser_ReadyStateChanged;
-                    _browser.Navigate($"file://{filename}");
+                    _browser.Navigate($"file://{filename.FileName}");
 
                     while (!_browserDone)
                     {
@@ -1199,8 +1208,8 @@ setTimeout(function(){
             }
             finally
             {
-                foreach (var path in filesToDelete)
-                    File.Delete(path);
+                foreach (var testfile in filesToDelete)
+                    testfile.Dispose();
             }
         }
 
@@ -1234,21 +1243,22 @@ setTimeout(function(){
             GeckoPreferences.User["layout.spellcheckDefault"] = 0;
         }
 
-        private string CreateTestHtmlFile()
+        private HtmlTestFile CreateTestHtmlFile()
         {
-            var htmlFile = Guid.NewGuid() + ".html";
-            var htmlPath = Path.Combine(Path.GetTempPath(), htmlFile);
-            File.WriteAllText(htmlPath, @"<html>
+            var ret = new HtmlTestFile();
+                ret.Write(
+                @"<html>
 <head>
 <meta charset=""utf-8""></meta>
 </head>
 <body>
 <h1>This is a test!</h1>
 <p class=""greenText"">of course it is...</p>
-<p id=""demo"" class=""redText"">The file is " + htmlPath + @"</p>
+<p id=""demo"" class=""redText"">The file is " + ret.FileName + @"</p>
 </body>
 </html>");
-            return htmlPath;
+
+            return ret;
         }
 
         void WebBrowser_ReadyStateChanged(object sender, EventArgs e)
@@ -1328,13 +1338,16 @@ setTimeout(function(){
         [Test]
         public void AttachEvents_ContentDomRefCountIsNotDecremented()
         {
-            _browser.Navigate(@"e:\test.html");
-            _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
-            var beforeRef = GetContentDomWindowComRefCount(_browser);
-            _browser.DetachEvents(true);
-            _browser.AttachEvents();
-            var afterRef = GetContentDomWindowComRefCount(_browser);
-            Assert.AreEqual(beforeRef, afterRef, "AttachEvents Should not decrement ContentDomWindow");
+            using (var testFile = new HtmlTestFile(@"<div>hello world</div>"))
+            {
+                _browser.Navigate(testFile.FileName);
+                _browser.NavigateFinishedNotifier.BlockUntilNavigationFinished();
+                var beforeRef = GetContentDomWindowComRefCount(_browser);
+                _browser.DetachEvents(true);
+                _browser.AttachEvents();
+                var afterRef = GetContentDomWindowComRefCount(_browser);
+                Assert.AreEqual(beforeRef, afterRef, "AttachEvents Should not decrement ContentDomWindow");
+            }
         }
 
         [Explicit("Test shows modal dialog")]
@@ -1413,5 +1426,36 @@ function clickButton() {
 </html>");
             return htmlPath;
         }
+
+        #region Helper Classes
+
+        class HtmlTestFile : IDisposable
+        {
+            private readonly string _fileName;
+
+            public string FileName => _fileName;
+
+            public HtmlTestFile(string html) : this()
+            {
+                Write(html);
+            }
+
+            public HtmlTestFile()
+            {
+                _fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".html");
+            }
+
+            public void Write(string html)
+            {
+                File.WriteAllText(_fileName, html);
+            }
+
+            public void Dispose()
+            {
+                File.Delete(_fileName);
+            }
+        }
+
+        #endregion
     }
 }
