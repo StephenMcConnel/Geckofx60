@@ -13,17 +13,29 @@
     <description>library that allows embeding gecko in C# applications.
 	
 	Example Usage:
-	
+
+        // In MonoDevelop Project Options -> Run -> Configuration -> Default set the following envrionment variables.
+        // set env var LD_LIBRARY_PATH to $(ProjectDir)/Firefox-Linux64
+        // set env var LD_PRELOAD to $(ProjectDir)/Firefox-Linux64/libgeckofix.so
+
+ 
+        using System;
+        using System.Windows.Forms;
+        using Gecko;
+
         [STAThread]
         static void Main(string[] args)
         {
-            Xpcom.Initialize("Firefox64");
+            Xpcom.Initialize("Firefox");
             var geckoWebBrowser = new GeckoWebBrowser {Dock = DockStyle.Fill};
             Form f = new Form();
             f.Controls.Add(geckoWebBrowser);
             geckoWebBrowser.Navigate("www.google.com");
             Application.Run(f);
         }
+
+  You will also have to install gtk-sharp3 deb package if not already installed.
+  apt-get install gtk-sharp3
 	
 	</description>
     <copyright>Copyright 2015</copyright>
