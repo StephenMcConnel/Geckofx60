@@ -1,6 +1,11 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+
+== v60.0-0.45 ==
+1. Use icu for complex line breaking.
+2. Update to icu 66 (Unicode 13)
+
 == v60.0-0.44 ==
 1. Fix crashes when viewing JS Readium epub viewer.
 
