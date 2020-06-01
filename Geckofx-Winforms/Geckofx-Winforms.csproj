@@ -166,7 +166,9 @@
     <Compile Include="Interop\GeckoWebBrowserWeakRef.cs" />
     <Compile Include="Linux\GtkReparentingWrapperNoThread.cs" />
     <None Include="Firefox64\omni.ja" />
+    <None Include="Firefox64\platform.ini" />
     <None Include="Firefox\omni.ja" />
+    <None Include="Firefox\platform.ini" />
     <None Include="Geckofx-Winforms.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -194,13 +196,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Firefox64\platform.ini" />
     <None Include="Firefox\application.ini" />
     <None Include="Firefox\crashreporter.ini" />
     <None Include="Firefox\dependentlibs.list" />
     <None Include="Firefox\freebl3.chk" />
     <None Include="Firefox\nssdbm3.chk" />
-    <None Include="Firefox\platform.ini" />
     <None Include="Firefox\softokn3.chk" />
     <None Include="Firefox\update-settings.ini" />
     <None Include="Firefox\updater.ini" />
@@ -319,9 +319,9 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Geckofx60.64.Windows.0.12.0\build\Geckofx60.64.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.64.Windows.0.12.0\build\Geckofx60.64.Windows.targets'))" />
-    <Error Condition="!Exists('..\packages\Geckofx60.32.Windows.0.12.0\build\Geckofx60.32.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.Windows.0.12.0\build\Geckofx60.32.Windows.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx60.32.Windows.0.13.0\build\Geckofx60.32.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.Windows.0.13.0\build\Geckofx60.32.Windows.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx60.64.Windows.0.13.0\build\Geckofx60.64.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.64.Windows.0.13.0\build\Geckofx60.64.Windows.targets'))" />
   </Target>
-  <Import Project="..\packages\Geckofx60.64.Windows.0.12.0\build\Geckofx60.64.Windows.targets" Condition="Exists('..\packages\Geckofx60.64.Windows.0.12.0\build\Geckofx60.64.Windows.targets')" />
-  <Import Project="..\packages\Geckofx60.32.Windows.0.12.0\build\Geckofx60.32.Windows.targets" Condition="Exists('..\packages\Geckofx60.32.Windows.0.12.0\build\Geckofx60.32.Windows.targets')" />
+  <Import Project="..\packages\Geckofx60.32.Windows.0.13.0\build\Geckofx60.32.Windows.targets" Condition="Exists('..\packages\Geckofx60.32.Windows.0.13.0\build\Geckofx60.32.Windows.targets')" />
+  <Import Project="..\packages\Geckofx60.64.Windows.0.13.0\build\Geckofx60.64.Windows.targets" Condition="Exists('..\packages\Geckofx60.64.Windows.0.13.0\build\Geckofx60.64.Windows.targets')" />
 </Project>
