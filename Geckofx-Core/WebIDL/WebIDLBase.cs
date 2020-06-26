@@ -210,6 +210,12 @@ namespace Gecko.WebIDL
                        throw new NotImplementedException("WebIDLUnion are currently only supported for nsISupport and bool types and null's.");
                     }                    
                 }
+                else if (p is string[])
+                {
+                    var arrayAsJSString = $"[{string.Join(",", ((string[])p).Select(x => "'" + EscapeStringForJS(x) + "'"))}]";
+
+                    SpiderMonkey.JS_ExecuteScript(context.ContextPointer, arrayAsJSString, out val);
+                }
                 else
                     SpiderMonkey.JS_ExecuteScript(context.ContextPointer, (p ?? "null").ToString(), out val);
                 collection.Add(val);

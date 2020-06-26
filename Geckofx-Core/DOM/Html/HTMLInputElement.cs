@@ -30,6 +30,11 @@ namespace Gecko.DOM
 
         public GeckoFormElement Form => new GeckoFormElement(Window, (nsIDOMHTMLFormElement) _inputElement.Value.Form);
 
+        public void MozSetFileNameArray(string[] files)
+        {
+            _inputElement.Value.MozSetFileNameArray(files);
+        }
+
         public string Accept
         {
             get { return _inputElement.Value.Accept; }

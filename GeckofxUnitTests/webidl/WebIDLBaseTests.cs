@@ -50,6 +50,38 @@ llo")]
         }
 
         [Test]
+        public void SetProperty_ToStringArray()
+        {
+            _browser.TestLoadHtml("hello world.");
+            var objectUnderTest = new WebIDLBase((mozIDOMWindowProxy)_browser.Window.DomWindow, _browser.Window.DomWindow);
+
+            objectUnderTest.SetProperty("somethingRandom", new string[] { "abc", "def" });
+
+            // verify
+            var array = objectUnderTest.GetProperty<nsISupports>("somethingRandom");
+            using (var context = new AutoJSContext(_browser.Window))
+            {
+                Assert.AreEqual("abc,def", context.EvaluateScript("this.somethingRandom").ToString());
+            }
+        }
+
+        [Test]
+        public void SetProperty_ToEmptyStringArray()
+        {
+            _browser.TestLoadHtml("hello world.");
+            var objectUnderTest = new WebIDLBase((mozIDOMWindowProxy)_browser.Window.DomWindow, _browser.Window.DomWindow);
+
+            objectUnderTest.SetProperty("somethingRandom", new string[] { });
+
+            // verify
+            var array = objectUnderTest.GetProperty<nsISupports>("somethingRandom");
+            using (var context = new AutoJSContext(_browser.Window))
+            {
+                Assert.AreEqual(String.Empty, context.EvaluateScript("this.somethingRandom").ToString());
+            }
+        }
+
+        [Test]
         public void SetProperty_RegresstionTest_DoesNotThrowException()
         {
             var objectUnderTest = new WebIDLBase((mozIDOMWindowProxy)_browser.Window.DomWindow, _browser.Window.DomWindow);

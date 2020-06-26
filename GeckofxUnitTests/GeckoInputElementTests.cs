@@ -89,5 +89,18 @@ namespace GeckofxUnitTests
 
             Assert.AreEqual("clicked", element.Value);
         }
+
+        [Test]
+        public void MozSetFileNameArray_DoesNotThrowGeckoExceptionBecauseOfUndefinedEntryPoint()
+        {
+            browser.TestLoadHtml(
+                @"<input type=""file"" id=""txtbox"" value=""text"" onmousedown=""this.value = 'mousedowned';"" onmouseup=""this.value = 'mouseuped';"" onclick=""this.value = 'clicked';""/>");
+
+            GeckoInputElement element = (GeckoInputElement)browser.Document.GetHtmlElementById("txtbox");
+
+            Assert.DoesNotThrow(() => element.MozSetFileNameArray(new[] { "somefile.txt" }));
+        }
+
+
     }
 }

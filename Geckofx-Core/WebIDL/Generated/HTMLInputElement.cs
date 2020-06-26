@@ -635,7 +635,8 @@ namespace Gecko.WebIDL
         
         public void MozSetFileNameArray(string[] fileNames)
         {
-            this.CallVoidMethod("mozSetFileNameArray", fileNames);
+            // TODO: upgrade webidl compiler to generate array of array, to prevent each item in array being passed as argument.
+            this.CallVoidMethod("mozSetFileNameArray", new[] { fileNames } );
         }
         
         public void MozSetFileArray(nsISupports[] files)
