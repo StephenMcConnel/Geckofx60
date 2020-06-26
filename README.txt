@@ -1,6 +1,9 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+== v60.0-0.47 ==
+1. Support string sequences when calling webidl interfaces.
+2. Add MozSetFileNameArray support, which uses this.
 
 == v60.0-0.46 ==
 Readded ucioverride that got removed with icu 66 upgrade.
