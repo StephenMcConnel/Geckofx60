@@ -89,6 +89,7 @@ namespace GeckofxUnitTests
             }
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         [Platform(Exclude = "Linux", Reason = "Crashes on Linux")]
         public void JQueryExecutor_GetElementsByJQueryWithLargeHTML_Query1000Times_DoesNotProduceMemoryLeak()
@@ -109,6 +110,7 @@ namespace GeckofxUnitTests
             CleanUp(tempFile);
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         [Platform(Exclude = "Linux", Reason = "Crashes on Linux")]
         public void JQueryExecutor_GetElementsByJQueryWithLargeHTML_ReNavigateAndQuery1000Times_DoesNotProduceMemoryLeak()
@@ -128,6 +130,7 @@ namespace GeckofxUnitTests
             CleanUp(tempFile);
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         [Platform(Exclude = "Linux", Reason = "Crashes on Linux")]
         public void JQueryExecutor_ExecuteJQueryWithLargeHTML_ReturnsString_DoesNotProduceMemoryLeak()
@@ -151,6 +154,7 @@ namespace GeckofxUnitTests
             CleanUp(tempFile);
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         [Platform(Exclude = "Linux", Reason = "Crashes on Linux")]
         public void JQueryExecutor_ExecuteJQueryWithLargeHTML_ReturnsNothing_DoesNotProduceMemoryLeak()
@@ -173,6 +177,7 @@ namespace GeckofxUnitTests
             CleanUp(tempFile);
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         [Platform(Exclude = "Linux", Reason = "Crashes on Linux")]
         public void GeckoWebBrowser_ExecuteJQueryWithLargeHTML_ReturnsNothing_DoesNotProduceMemoryLeak()

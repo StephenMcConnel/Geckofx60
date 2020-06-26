@@ -73,6 +73,7 @@ namespace GeckofxUnitTests
 			Assert.Throws<COMException>(() => TestCookieServiceFactory.Register());
 		}
 
+		[Ignore("Test runner is running Explicit tests")]
 		[Test, Explicit]
 		public void Register_AfterDefaultFactoryHasBeenUnregistered_NewCookieServiceIsUsedInsteadOfDefaultOne()
 		{

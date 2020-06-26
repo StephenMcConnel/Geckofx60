@@ -1112,6 +1112,7 @@ setTimeout(function(){
         }
 
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Test shows modal dialog")]
         [Test]
         public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages()
@@ -1134,6 +1135,7 @@ setTimeout(function(){
             _form.ShowDialog();
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Test shows modal dialog")]
         [Test]
         public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages2()
@@ -1174,6 +1176,7 @@ setTimeout(function(){
 
         private bool _browserDone;
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Test shows modal dialog")]
         [Test]
         public void NavigateMemoryTests_SingleBrowserMultipleNavigations_DoesNotHoldOnToLotsOfPages3()
@@ -1275,6 +1278,7 @@ setTimeout(function(){
             _browserDone = true;
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Slow and connects to google")]
         [Test]
         public void EvaluateScript_OnParentLessBrowserIstanceAndApplicationDoEventsBeingCalled_DoesNotCrash()
@@ -1304,6 +1308,7 @@ setTimeout(function(){
             }
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Slow and connects to google")]
         [Test]
         public void EvaluateScript_NavigateToPageThatDoesSamePageNavigations_DoesNotCrash()
@@ -1350,6 +1355,7 @@ setTimeout(function(){
             }
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Explicit("Test shows modal dialog")]
         [Test]
         public void JavascriptBlobTest()

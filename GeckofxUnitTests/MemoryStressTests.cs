@@ -33,6 +33,7 @@ namespace GeckofxUnitTests
             Xpcom.Shutdown();
         }
 
+        [Ignore("Test runner is running Explicit tests")]
         [Test, Explicit]
         public void StressTestGeckoFxBrowserMemory()
         {
