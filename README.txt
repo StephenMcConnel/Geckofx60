@@ -1,6 +1,13 @@
 Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
+
+== v60.0-0.48 ==
+1. Linux fix - emit missing mousemove events.
+In newer version of Gtk/Gdk event compression is on by default.
+This was causing, even the last, mousemove event to be dropped when using 
+multiple GeckoWebbrowser instances.
+
 == v60.0-0.47 ==
 1. Support string sequences when calling webidl interfaces.
 2. Add MozSetFileNameArray support, which uses this.
