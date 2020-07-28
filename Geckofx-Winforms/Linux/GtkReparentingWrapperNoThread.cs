@@ -86,16 +86,17 @@ namespace GtkDotNet
                 return;
 
             // Wraps the panel native (X) window handle in a GdkWrapper
+            var numberOfGTKEvents = int.Parse(Environment.GetEnvironmentVariable("GECKOFX_CREATEEVENTS") ?? "4");
 
             IntPtr gdkHandle = ForeignNewForDisplay(Gdk.Display.Default.Handle, _parent.Handle);
             _gdkWrapperOfForm = new Gdk.Window(gdkHandle);
             System.Windows.Forms.Application.DoEvents();
-            ProcessPendingGtkEvents();
+            ProcessPendingGtkEvents(numberOfGTKEvents);
 
             // embed _popupWindow into winform (m_parent)
             _originalParent = _popupWindow.Window.Parent;
             _popupWindow.Window.Reparent(_gdkWrapperOfForm, 0, 0);
-            ProcessPendingGtkEvents();
+            ProcessPendingGtkEvents(numberOfGTKEvents);
         }
 
         void HandleParentCreated(object sender, EventArgs e)
