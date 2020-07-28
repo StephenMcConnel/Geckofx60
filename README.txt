@@ -2,6 +2,12 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.49 ==
+1. Linux fix - KDE desktop.
+Also added GECKOFX_CREATEEVENTS which controls the number of GTK events that a pumped during
+window creation. Previously this was implicitly 2048, while this fix changed the default to 4.
+This can be override by any integer, eg. GECKOFX_CREATEEVENTS=50
+
 == v60.0-0.48 ==
 1. Linux fix - emit missing mousemove events.
 In newer version of Gtk/Gdk event compression is on by default.
