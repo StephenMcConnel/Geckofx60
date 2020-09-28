@@ -2,6 +2,10 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.50 ==
+1. Add abality to suspend spidermonkey GC.
+This can be done by passing true as second paramter of AutoJSContext constructor or by calling SpiderMonkey.JS_SuspendGC and SpiderMonkey.JS_ResumeGC
+
 == v60.0-0.49 ==
 1. Linux fix - KDE desktop.
 Also added GECKOFX_CREATEEVENTS which controls the number of GTK events that a pumped during
