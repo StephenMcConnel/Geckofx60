@@ -507,6 +507,12 @@ namespace Gecko
         [DllImport("xul", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr ToStringSlow(IntPtr cx, ref JsVal v);
 
-#endregion
+        [DllImport("xul", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void JS_SuspendGC();
+
+        [DllImport("xul", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void JS_ResumeGC();
+
+        #endregion
     }
 }

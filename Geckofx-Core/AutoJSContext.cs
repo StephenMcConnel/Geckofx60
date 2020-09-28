@@ -77,6 +77,8 @@ namespace Gecko
         /// </summary>
         private static Dictionary<IntPtr, HashSet<IntPtr>> _wrappedComObjectsReferences = new Dictionary<IntPtr, HashSet<IntPtr>>();
 
+        private bool _suspendGC;
+
         #endregion
 
         #region Properties
@@ -101,27 +103,27 @@ namespace Gecko
 
         #region Connstructors
 
-        public AutoJSContext(GeckoWindow window) :
-            this((nsIGlobalObject)window.DomWindow)
+        public AutoJSContext(GeckoWindow window, bool suspendGC = false) :
+            this((nsIGlobalObject)window.DomWindow, suspendGC)
         {
         }
 
-        public AutoJSContext(mozIDOMWindowProxy window) :
-            this((nsIGlobalObject) window)
+        public AutoJSContext(mozIDOMWindowProxy window, bool suspendGC = false) :
+            this((nsIGlobalObject) window, suspendGC)
         {
         }
 
-        public AutoJSContext(nsISupports window) :
-            this((nsIGlobalObject)window)
+        public AutoJSContext(nsISupports window, bool suspendGC = false) :
+            this((nsIGlobalObject)window, suspendGC)
         {
         }
 
-        public AutoJSContext(mozIDOMWindow window) :
-        this((nsIGlobalObject)window)
+        public AutoJSContext(mozIDOMWindow window, bool suspendGC = false) :
+        this((nsIGlobalObject)window, suspendGC)
         {
         }
 
-        public AutoJSContext(nsIGlobalObject window)
+        public AutoJSContext(nsIGlobalObject window, bool suspendGC = false)
         {
             var context = SafeJSContext;
             var go = (nsIGlobalObject) window;
@@ -146,6 +148,10 @@ namespace Gecko
             }
 
             _contextStack.Push(this);
+
+            _suspendGC = suspendGC;
+            if (_suspendGC)
+                SpiderMonkey.JS_SuspendGC();
         }        
 #endregion
 
@@ -482,6 +488,9 @@ namespace Gecko
             if (_contextStack.Peek() != this)
                 throw new Exception("Missing dispose.");
 #endif
+            if (_suspendGC)
+                SpiderMonkey.JS_ResumeGC();
+
             _contextStack.Pop();
 
             if (_defaultCompartment != null)

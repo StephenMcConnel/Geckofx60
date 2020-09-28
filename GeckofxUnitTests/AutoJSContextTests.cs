@@ -29,7 +29,17 @@ namespace GeckofxUnitTests
 			_browser.Dispose();
 		}
 
-            [Ignore("TODO: I think this may need backstagepass access.")]
+		[Test]
+		public void SuspendGC()
+        {
+			using (var context = new AutoJSContext(_browser.Window.DomWindow, true))
+			{
+				Assert.AreEqual(5, context.EvaluateScript("2+3").I32);
+			}
+		}
+
+
+		[Ignore("TODO: I think this may need backstagepass access.")]
 	    [Test]
 	    public void GetComponentsObject_DoesNotReturnNull()
 	    {
