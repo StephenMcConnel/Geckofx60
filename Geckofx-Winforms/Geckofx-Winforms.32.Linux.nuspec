@@ -6,7 +6,7 @@
     <title>geckofx-60 Linux 32bit</title>
     <authors>geckofx</authors>
     <owners>geckofx</owners>
-    <projectUrl>https://bitbucket.org/geckofx/</projectUrl>
+    <projectUrl>https://hg.sr.ht/~hindlemail/geckofx</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>library that allows embeding gecko in C# applications.</summary>
     <description>library that allows embeding gecko in C# applications.
