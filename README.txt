@@ -2,6 +2,10 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.51 ==
+
+1. Liunx build - upgrade to add support for ffmpg 4.0 (for Ubuntu 20.04)
+
 == v60.0-0.50 ==
 1. Add abality to suspend spidermonkey GC.
 This can be done by passing true as second paramter of AutoJSContext constructor or by calling SpiderMonkey.JS_SuspendGC and SpiderMonkey.JS_ResumeGC
