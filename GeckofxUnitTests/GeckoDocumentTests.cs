@@ -151,6 +151,48 @@ namespace GeckofxUnitTests
             Assert.AreEqual("HTML", browser.Document.EvaluateXPath("//*").GetSingleNodeValue().NodeName);
         }
 
+        [Test]
+        public void SelectFirst_Multiple_ReturnsFirst()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1><h1><span>text</span></h1><h1><span>text</span></h1>");
+            Assert.AreEqual("H1", browser.Document.SelectFirst("HTML/Body/h1").NodeName);
+        }
+
+        [Test]
+        public void SelectFirst_Single_ReturnsItem()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1>");
+            Assert.AreEqual("H1", browser.Document.SelectFirst("HTML/Body/h1").NodeName);
+        }
+
+        [Test]
+        public void SelectFirst_Zero_ReturnsNull()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1>");
+            Assert.IsNull(browser.Document.SelectFirst("HTML/Body/lalala"));
+        }
+
+        [Test]
+        public void SelectSingle_Multiple_ThrowException()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1><h1><span>text</span></h1><h1><span>text</span></h1>");
+            Assert.Throws<InvalidOperationException>(() => browser.Document.SelectSingle("HTML/Body/h1"));
+        }
+
+        [Test]
+        public void SelectSinglet_Single_ReturnsItem()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1>");
+            Assert.AreEqual("H1", browser.Document.SelectSingle("HTML/Body/h1").NodeName);
+        }
+
+        [Test]
+        public void SelectSingle_Zero_ThrowException()
+        {
+            browser.TestLoadHtml("<h1><span>text</span></h1>");
+            Assert.Throws<InvalidOperationException>(() => browser.Document.SelectSingle("HTML/Body/lalala"));
+        }
+
         [TestCase("MouseEvent", typeof(DomMouseEventArgs))]
         [TestCase("KeyEvents", typeof(DomUIEventArgs))]
 	    public void CreateEvent_VariousEvents_ExpectedWrapperTypesProduced(string eventName, Type expectedWrapperType)

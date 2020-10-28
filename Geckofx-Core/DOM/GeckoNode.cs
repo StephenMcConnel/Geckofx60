@@ -6,6 +6,7 @@ using Gecko.DOM;
 using Gecko.Interop;
 using Gecko.WebIDL;
 using XPathResult = Gecko.DOM.XPathResult;
+using System.Linq;
 
 namespace Gecko
 {
@@ -230,88 +231,22 @@ namespace Gecko
         /// <returns></returns>
         public GeckoNode SelectFirst(string xpath)
         {
-            var r = EvaluateXPathInternal(xpath);
-
-            nsIDOMNode singleNode = null;
-            using (var context = new AutoJSContext(Window))
-            using (var jsObject = context.ConvertCOMObjectToJSObject((nsISupports)r))
-            {
-                // TODO: (Idenally I would generate these calls via a webidl-> C# compiler but for now just do it via manually written spidermonkey calls..)
-                var resultType = SpiderMonkey.JS_GetProperty(context.ContextPointer, jsObject.JSObject, "resultType").ToInteger();
-
-#if PORTFF60
-                switch (resultType)
-                {
-                    case nsIDOMXPathResultConsts.UNORDERED_NODE_ITERATOR_TYPE:
-                        singleNode =
-                            (nsIDOMNode)
-                                SpiderMonkey.JS_CallFunctionName(context.ContextPointer, jsObject, "iterateNext",
-                                    new JsVal[0]).ToComObject(context.ContextPointer);
-                        break;
-                    case nsIDOMXPathResultConsts.FIRST_ORDERED_NODE_TYPE:
-                    case nsIDOMXPathResultConsts.ANY_UNORDERED_NODE_TYPE:
-                        singleNode =
-                            (nsIDOMNode)
-                                SpiderMonkey.JS_GetProperty(context.ContextPointer, jsObject, "singleNodeValue")
-                                    .ToComObject(context.ContextPointer);
-                        break;
-                }
-#endif
-                throw new NotImplementedException();
-#if PORTFF60
-                var ret = singleNode.Wrap(GeckoNode.Create);
-                Xpcom.FreeComObject(ref r);
-                return ret;
-#endif
-            }
+            return EvaluateXPath(xpath).GetSingleNodeValue();
         }
 
         public GeckoNode SelectSingle(string xpath)
         {
-            var r = EvaluateXPathInternal(xpath);
+            var r = EvaluateXPath(xpath);
+            var nodes = r.GetNodes();
+            var first = nodes.FirstOrDefault();
 
-            nsIDOMNode singleNode = null;
-            using (var context = new AutoJSContext(Window))
-            using (var jsObject = context.ConvertCOMObjectToJSObject((nsISupports)r))
-            {               
-                // TODO: (Idenally I would generate these calls via a webidl-> C# compiler but for now just do it via manually written spidermonkey calls..)
-                var resultType = SpiderMonkey.JS_GetProperty(context.ContextPointer, jsObject.JSObject, "resultType").ToInteger();
+            // this is counting what is left after FirstOrDefault. (GetNotes implementation isn't very good)            
+            var n = nodes.Count();
+            
+            if (first == null || n > 0)
+                throw new InvalidOperationException();
 
-#if PORTFF60
-                switch (resultType)
-                {
-                    case nsIDOMXPathResultConsts.UNORDERED_NODE_ITERATOR_TYPE:
-                        singleNode =
-                            (nsIDOMNode)
-                                SpiderMonkey.JS_CallFunctionName(context.ContextPointer, jsObject, "iterateNext",
-                                    new JsVal[0]).ToComObject(context.ContextPointer);
-                        var test =
-                            (SpiderMonkey.JS_CallFunctionName(context.ContextPointer, jsObject, "iterateNext",
-                                new JsVal[0]));
-                        if (!test.IsNull)
-                        {
-                            Xpcom.FreeComObject(ref singleNode);
-                            Xpcom.FreeComObject(ref r);
-                            throw new GeckoDomException("There are more than 1 nodes in Single selection");
-                        }
-                        break;
-                    case nsIDOMXPathResultConsts.FIRST_ORDERED_NODE_TYPE:
-                    case nsIDOMXPathResultConsts.ANY_UNORDERED_NODE_TYPE:
-                        singleNode =
-                            (nsIDOMNode)
-                                SpiderMonkey.JS_GetProperty(context.ContextPointer, jsObject, "singleNodeValue")
-                                    .ToComObject(context.ContextPointer);
-                        break;
-                }
-#endif
-                throw new NotImplementedException();
-            }
-
-            #if PORTFF60
-            var ret = singleNode.Wrap(GeckoNode.Create);
-            Xpcom.FreeComObject(ref r);
-            return ret;
-#endif
+            return first;
         }
 
         public DomEventTarget GetEventTarget()
