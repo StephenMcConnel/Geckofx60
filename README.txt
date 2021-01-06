@@ -2,6 +2,12 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.52 ==
+1. Implement SelectSingle and SelectFirst
+2. Update to FF nuget package 0.16.0
+Add gecko pref "intl.complexLineBreaking.uniscribe" which if true,
+causes uniscribe to be used for linebreaking instead of icu.
+
 == v60.0-0.51 ==
 
 1. Liunx build - upgrade to add support for ffmpg 4.0 (for Ubuntu 20.04)
