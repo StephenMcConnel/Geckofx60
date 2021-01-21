@@ -2,6 +2,9 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.53 ==
+1. Bug fix (prevent additional cpu usage when suspended spidermonkey GC).
+
 == v60.0-0.52 ==
 1. Implement SelectSingle and SelectFirst
 2. Update to FF nuget package 0.16.0
