@@ -2,6 +2,10 @@ Geckofx is licensed under the Mozilla Public License Version.
 
 == Changelog ==
 
+== v60.0-0.54 ==
+
+1. Graphite update to 1.3.14
+
 == v60.0-0.53 ==
 1. Bug fix (prevent additional cpu usage when suspended spidermonkey GC).
 
